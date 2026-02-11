@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>chefe de ouro | Boutique de Semi-Joias</title>
+    <title>Gold Boss | Catálogo de Semi-Joias</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -35,7 +35,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: shine 4s linear infinite;
-            text-shadow: 0 10px 30px rgba(212, 175, 55, 0.1);
         }
         @keyframes shine { to { background-position: 200% center; } }
 
@@ -59,82 +58,27 @@
             background: #d4af37;
             width: 0;
             transition: width 3s linear;
+            z-index: 50;
         }
         
-        .status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
-        .animate-pulse-sync { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
-
         .animate-slide-left { animation: slideLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes slideLeft { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
 
         .image-upload-area {
             border: 1px dashed rgba(212, 175, 55, 0.3);
             border-radius: 6px;
-            padding: 10px;
+            padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            background: rgba(255,255,255,0.01);
         }
-        .image-upload-area:hover {
-            border-color: #d4af37;
-            background: rgba(212, 175, 55, 0.05);
-        }
+        .image-upload-area:hover { border-color: #d4af37; background: rgba(212, 175, 55, 0.05); }
 
-        .dot-indicator {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            transition: all 0.4s ease;
-        }
-        .dot-indicator.active {
-            background: #d4af37;
-            width: 18px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
-        }
-        
-        .product-image-container img {
-            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .product-image-container:hover img {
-            transform: scale(1.08);
-        }
-        
-        .cloudinary-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #d4af37;
-            color: black;
-            font-size: 8px;
-            padding: 3px 6px;
-            border-radius: 2px;
-            font-weight: 900;
-            text-transform: uppercase;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            z-index: 5;
-        }
-
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
-        
         .toast-notification {
             position: fixed;
             bottom: 30px;
@@ -148,12 +92,13 @@
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.2em;
-            z-index: 1000;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            animation: toastIn 0.5s cubic-bezier(0.16, 1, 0.3, 1), toastOut 0.5s cubic-bezier(0.16, 1, 0.3, 1) 2.5s forwards;
+            z-index: 2000;
+            animation: toastIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes toastIn { from { bottom: -50px; opacity: 0; } to { bottom: 30px; opacity: 1; } }
-        @keyframes toastOut { from { bottom: 30px; opacity: 1; } to { bottom: -50px; opacity: 0; } }
+
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -162,13 +107,16 @@
     <script type="text/babel">
         const { useState, useMemo, useEffect, useRef } = React;
 
+        // ==========================================
+        // CONFIGURAÇÕES DA MARCA
+        // ==========================================
+        const BRAND_NAME = "Gold Boss";
+        const WHATSAPP_NUMBER_DEFAULT = ""; 
+        const ADMIN_PASSWORD = "adm2026"; // Senha atualizada conforme solicitação
+
         const CONFIG_NUVEM = {
-            binId: '69869a37ae596e708f173ec4',
             apiKey: '$2a$10$RxtN.VwYLRsGcmoCji08oeL2di9W0D4tyrBZe/vIV77N665ALQ9Vi'
         };
-
-        const WHATSAPP_NUMBER = "5577981633924"; 
-        const ADMIN_PASSWORD = "adm2026"; 
 
         const Category = {
             TODOS: 'Todos',
@@ -179,105 +127,6 @@
             CONJUNTOS: 'Conjuntos'
         };
 
-        const ProductCard = ({ product, isEditMode, onEdit, onDelete, onAddToCart }) => {
-            const [currentIdx, setCurrentIdx] = useState(0);
-            const [isFading, setIsFading] = useState(false);
-            const images = product.images || [];
-
-            const handleNext = (e) => {
-                e.stopPropagation();
-                if (images.length <= 1) return;
-                setIsFading(true);
-                setTimeout(() => {
-                    setCurrentIdx((prev) => (prev + 1) % images.length);
-                    setIsFading(false);
-                }, 150);
-            };
-
-            return (
-                <div className="group bg-[#0d0d0d] border border-white/5 overflow-hidden transition-all hover:border-[#d4af37]/40 relative animate-fade-in shadow-2xl">
-                    <div className="aspect-[3/4] overflow-hidden bg-black relative cursor-pointer product-image-container" onClick={handleNext}>
-                        {images.length > 0 ? (
-                            <img 
-                                src={images[currentIdx]} 
-                                className={`w-full h-full object-cover transition-opacity duration-300 ${isFading ? 'opacity-0' : 'opacity-100'}`} 
-                                alt={product.name} 
-                                loading="lazy" 
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-800 text-[10px] uppercase tracking-[0.3em] font-bold">Sem Mídia</div>
-                        )}
-                        
-                        {images.length > 1 && (
-                            <div className="absolute top-6 left-0 right-0 flex justify-center gap-1.5 pointer-events-none z-10">
-                                {images.map((_, i) => (
-                                    <div key={i} className={`dot-indicator ${i === currentIdx ? 'active' : ''}`} />
-                                ))}
-                            </div>
-                        )}
-
-                        {isEditMode ? (
-                            <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm z-20 px-6">
-                                <button onClick={(e) => {e.stopPropagation(); onEdit(product);}} className="bg-white text-black px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.3em] w-full hover:bg-[#d4af37] transition-all">Editar Joia</button>
-                                <button onClick={(e) => {e.stopPropagation(); onDelete(product.id);}} className="bg-red-950 text-white px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.3em] w-full hover:bg-red-700 transition-all">Excluir</button>
-                            </div>
-                        ) : (
-                            <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-all duration-500 z-20">
-                                <button onClick={(e) => {e.stopPropagation(); onAddToCart(product);}} className="w-full bg-white text-black py-4.5 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#d4af37] shadow-2xl active:scale-95 transition-all">Adicionar à Sacola</button>
-                            </div>
-                        )}
-                    </div>
-                    <div className="p-7">
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="text-[#d4af37] text-[9px] uppercase font-black tracking-[0.3em]">{product.category}</span>
-                            {images.length > 1 && <span className="text-white/20 text-[8px] font-black tracking-widest uppercase">Toque p/ trocar</span>}
-                        </div>
-                        <h4 className="text-sm font-medium mb-1.5 truncate text-white/90 tracking-tight leading-relaxed uppercase">{product.name}</h4>
-                        <p className="font-bold text-xl text-white font-serif">R$ {parseFloat(product.price).toFixed(2)}</p>
-                    </div>
-                </div>
-            );
-        };
-
-        const Navbar = ({ cartCount, onOpenCart, isVisible, isEditMode, onLongPressStart, onLongPressEnd, isPressing, onOpenAdminModal, cloudStatus, isSyncing }) => {
-            if (!isVisible) return null;
-            return (
-                <nav className="sticky top-0 z-[100] bg-[#050505]/95 backdrop-blur-2xl border-b border-white/5 py-6 px-6 shadow-2xl">
-                    <div className="flex justify-between items-center max-w-7xl mx-auto">
-                        <div 
-                            className="relative cursor-pointer select-none group"
-                            onMouseDown={onLongPressStart} onMouseUp={onLongPressEnd} onMouseLeave={onLongPressEnd}
-                            onTouchStart={onLongPressStart} onTouchEnd={onLongPressEnd}
-                        >
-                            <div className="flex flex-col items-start">
-                                <div className="flex items-center gap-4">
-                                    <h1 className="text-2xl md:text-3xl font-serif font-bold tracking-[0.15em] text-[#d4af37] uppercase group-hover:brightness-125 transition-all">Gold Paty</h1>
-                                    {isEditMode && <span className="bg-[#d4af37] text-black text-[8px] font-black px-2 py-0.5 rounded-sm">ADMIN</span>}
-                                </div>
-                                <div className="flex items-center text-[7px] uppercase tracking-[0.4em] text-gray-500 mt-1.5 font-bold">
-                                    <span className={`status-dot ${isSyncing ? 'bg-[#d4af37] animate-pulse-sync' : (cloudStatus === 'online' ? 'bg-emerald-500' : 'bg-red-600')}`}></span>
-                                    {isSyncing ? 'Sincronizando Mídia...' : (cloudStatus === 'online' ? 'Showroom Online' : 'Modo Offline')}
-                                </div>
-                            </div>
-                            <div className="long-press-indicator" style={{ width: isPressing ? '100%' : '0' }}></div>
-                        </div>
-                        
-                        <div className="flex items-center gap-8">
-                            {isEditMode && (
-                                <button onClick={onOpenAdminModal} className="hidden md:block text-[10px] font-black uppercase tracking-[0.3em] text-[#d4af37] bg-[#d4af37]/5 border border-[#d4af37]/20 px-6 py-3 hover:bg-[#d4af37] hover:text-black transition-all">Gestão</button>
-                            )}
-                            <button onClick={onOpenCart} className="relative p-3 group bg-white/5 rounded-full border border-white/5 hover:border-[#d4af37]/40 transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white/80 group-hover:text-[#d4af37] transition-colors">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
-                                </svg>
-                                {cartCount > 0 && <span className="absolute -top-1 -right-1 bg-[#d4af37] text-black text-[9px] w-5 h-5 flex items-center justify-center rounded-full font-black ring-2 ring-black">{cartCount}</span>}
-                            </button>
-                        </div>
-                    </div>
-                </nav>
-            );
-        };
-
         const App = () => {
             const [products, setProducts] = useState([]);
             const [isCatalogOpen, setIsCatalogOpen] = useState(false);
@@ -285,22 +134,24 @@
             const [cart, setCart] = useState([]);
             const [isCartOpen, setIsCartOpen] = useState(false);
             const [search, setSearch] = useState('');
+            
             const [isEditMode, setIsEditMode] = useState(false);
             const [isPressing, setIsPressing] = useState(false);
             const [showPasswordModal, setShowPasswordModal] = useState(false);
             const [passwordInput, setPasswordInput] = useState('');
             const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+            
             const [editingProduct, setEditingProduct] = useState(null);
             const [form, setForm] = useState({ name: '', price: '', category: Category.BRINCOS, images: [] });
             const [isSyncing, setIsSyncing] = useState(false);
-            const [cloudStatus, setCloudStatus] = useState('offline');
-            const [uploadError, setUploadError] = useState(null);
             const [toast, setToast] = useState(null);
             
-            // Cloudinary Config
-            const [cloudinaryConfig, setCloudinaryConfig] = useState({
-                cloudName: localStorage.getItem('gp_cloudinary_name') || 'h99uknvq',
-                uploadPreset: localStorage.getItem('gp_cloudinary_preset') || ''
+            // Persistência local das configurações de servidor
+            const [settings, setSettings] = useState({
+                cloudName: localStorage.getItem('gb_cloud_name') || '',
+                uploadPreset: localStorage.getItem('gb_upload_preset') || '',
+                binId: localStorage.getItem('gb_bin_id') || '',
+                whatsapp: localStorage.getItem('gb_whatsapp') || WHATSAPP_NUMBER_DEFAULT
             });
 
             const pressTimer = useRef(null);
@@ -311,423 +162,335 @@
                 setTimeout(() => setToast(null), 3000);
             };
 
-            const loadDataFromCloud = async () => {
-                setIsSyncing(true);
-                try {
-                    const timestamp = new Date().getTime();
-                    const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG_NUVEM.binId}/latest?nocache=${timestamp}`, {
-                        headers: { 
-                            'X-Master-Key': CONFIG_NUVEM.apiKey,
-                            'Cache-Control': 'no-cache'
-                        }
-                    });
-                    
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.record && Array.isArray(data.record)) {
-                            setProducts(data.record);
-                            setCloudStatus('online');
-                            localStorage.setItem('gp_products_v9', JSON.stringify(data.record));
-                        }
-                    }
-                } catch (e) {
-                    const local = localStorage.getItem('gp_products_v9');
-                    if (local) setProducts(JSON.parse(local));
-                    setCloudStatus('offline');
-                }
-                setIsSyncing(false);
-            };
-
-            useEffect(() => { loadDataFromCloud(); }, []);
-
-            const syncToCloud = async (updatedList) => {
-                setIsSyncing(true);
-                try {
-                    const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG_NUVEM.binId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': CONFIG_NUVEM.apiKey,
-                            'X-Bin-Versioning': 'false'
-                        },
-                        body: JSON.stringify(updatedList)
-                    });
-                    
-                    if (res.ok) {
-                        localStorage.setItem('gp_products_v9', JSON.stringify(updatedList));
-                        setCloudStatus('online');
-                    }
-                } catch (e) { 
-                    alert("Erro crítico ao sincronizar servidor.");
-                }
-                setIsSyncing(false);
-            };
-
-            const uploadToCloudinary = async (file) => {
-                setUploadError(null);
-                const { cloudName, uploadPreset } = cloudinaryConfig;
-
-                if (!cloudName || !uploadPreset) {
-                    setUploadError("⚠️ Configuração ausente: Informe Cloud Name e Preset Unsigned.");
-                    return null;
-                }
-
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('upload_preset', uploadPreset);
-
-                try {
-                    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const data = await res.json();
-                    
-                    if (data.secure_url) {
-                        return data.secure_url;
-                    } else {
-                        let errorMsg = data.error?.message || "Erro no servidor de mídia.";
-                        if (errorMsg.includes("Unknown API key")) {
-                            errorMsg = "❌ Erro: Cloud Name incorreto ou Preset não é 'Unsigned'.";
-                        }
-                        setUploadError(errorMsg);
-                        return null;
-                    }
-                } catch (e) {
-                    setUploadError("❌ Falha de conexão com Cloudinary.");
-                    return null;
-                }
-            };
-
-            const handleFileChange = async (e) => {
-                const files = Array.from(e.target.files);
-                if (files.length === 0) return;
-                
-                const remaining = 4 - form.images.length;
-                if (remaining <= 0) return alert("Máximo de 4 fotos atingido.");
-
-                setIsSyncing(true);
-                const toProcess = files.slice(0, remaining);
-                
-                const uploadPromises = toProcess.map(file => uploadToCloudinary(file));
-                const results = await Promise.all(uploadPromises);
-                
-                const successfulUploads = results.filter(url => url !== null);
-                
-                if (successfulUploads.length > 0) {
-                    setForm(prev => ({ ...prev, images: [...prev.images, ...successfulUploads] }));
-                }
-                setIsSyncing(false);
-                e.target.value = ''; 
-            };
-
-            const handleLongPressStart = () => {
+            const handleStartPress = () => {
                 setIsPressing(true);
+                if (pressTimer.current) clearTimeout(pressTimer.current);
                 pressTimer.current = setTimeout(() => {
                     setIsPressing(false);
                     setShowPasswordModal(true);
                 }, 3000);
             };
 
-            const handleLongPressEnd = () => {
+            const handleEndPress = () => {
                 setIsPressing(false);
                 if (pressTimer.current) clearTimeout(pressTimer.current);
             };
 
-            const handlePasswordSubmit = (e) => {
-                e.preventDefault();
+            const handleLogin = (e) => {
+                if(e) e.preventDefault();
                 if (passwordInput === ADMIN_PASSWORD) {
                     setIsEditMode(true);
                     setShowPasswordModal(false);
+                    setIsAdminModalOpen(true); // Abre o painel automaticamente
+                    setIsCatalogOpen(true);    // Entra no catálogo
                     setPasswordInput('');
-                    if (!isCatalogOpen) setIsCatalogOpen(true);
-                    showToast("Painel de Gestão Ativo");
-                } else { alert("Senha Incorreta"); }
-            };
-
-            const handleSaveProduct = async (e) => {
-                e.preventDefault();
-                if (form.images.length === 0) return alert("A joia precisa de ao menos uma foto HD.");
-
-                const productData = { 
-                    name: form.name,
-                    price: parseFloat(form.price),
-                    category: form.category,
-                    images: form.images,
-                    id: editingProduct ? editingProduct.id : Date.now().toString()
-                };
-
-                let newList;
-                if (editingProduct) {
-                    newList = products.map(p => p.id === editingProduct.id ? productData : p);
+                    showToast("Bem-vindo, Boss!");
                 } else {
-                    newList = [...products, productData];
-                }
-                
-                setProducts(newList);
-                await syncToCloud(newList);
-                
-                setEditingProduct(null);
-                setForm({ name: '', price: '', category: Category.BRINCOS, images: [] });
-                setIsAdminModalOpen(false);
-                showToast(editingProduct ? "Joia Atualizada" : "Joia Publicada");
-            };
-
-            const handleDelete = async (id) => {
-                if (confirm("Deseja remover esta joia permanentemente da vitrine?")) {
-                    const newList = products.filter(p => p.id !== id);
-                    setProducts(newList);
-                    await syncToCloud(newList);
-                    showToast("Joia Removida");
+                    alert("Acesso Negado.");
                 }
             };
 
-            const addToCart = (prod) => {
-                setCart(prev => {
-                    const ex = prev.find(i => i.id === prod.id);
-                    if (ex) return prev.map(i => i.id === prod.id ? {...i, quantity: i.quantity + 1} : i);
-                    return [...prev, {...prod, quantity: 1}];
+            const loadData = async () => {
+                const targetBin = settings.binId;
+                if (!targetBin) return;
+                setIsSyncing(true);
+                try {
+                    const res = await fetch(`https://api.jsonbin.io/v3/b/${targetBin}/latest`, {
+                        headers: { 'X-Master-Key': CONFIG_NUVEM.apiKey }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        setProducts(data.record || []);
+                    }
+                } catch (e) {
+                    const local = localStorage.getItem('gb_local_data');
+                    if (local) setProducts(JSON.parse(local));
+                }
+                setIsSyncing(false);
+            };
+
+            useEffect(() => { loadData(); }, [settings.binId]);
+
+            const syncToCloud = async (newList) => {
+                const targetBin = settings.binId;
+                if (!targetBin) {
+                    localStorage.setItem('gb_local_data', JSON.stringify(newList));
+                    return;
+                }
+                setIsSyncing(true);
+                try {
+                    await fetch(`https://api.jsonbin.io/v3/b/${targetBin}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'X-Master-Key': CONFIG_NUVEM.apiKey },
+                        body: JSON.stringify(newList)
+                    });
+                    localStorage.setItem('gb_local_data', JSON.stringify(newList));
+                } catch (e) { alert("Falha na sincronização."); }
+                setIsSyncing(false);
+            };
+
+            const handleFileUpload = async (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+                
+                if (!settings.cloudName || !settings.uploadPreset) {
+                    alert("Configure o Cloudinary no painel primeiro!");
+                    return;
+                }
+
+                setIsSyncing(true);
+                const uploads = files.map(async (file) => {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_preset', settings.uploadPreset);
+                    try {
+                        const res = await fetch(`https://api.cloudinary.com/v1_1/${settings.cloudName}/image/upload`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await res.json();
+                        return data.secure_url || null;
+                    } catch { return null; }
                 });
-                showToast("Adicionado à sacola");
+
+                const results = await Promise.all(uploads);
+                const valid = results.filter(r => r !== null);
+                setForm(prev => ({ ...prev, images: [...prev.images, ...valid].slice(0, 4) }));
+                setIsSyncing(false);
             };
 
-            const filtered = useMemo(() => 
-                products.filter(p => (selectedCategory === Category.TODOS || p.category === selectedCategory) && p.name.toLowerCase().includes(search.toLowerCase()))
-            , [selectedCategory, search, products]);
-
-            const updateCloudConfig = (field, val) => {
-                const clean = val.trim();
-                const newConfig = {...cloudinaryConfig, [field]: clean};
-                setCloudinaryConfig(newConfig);
-                localStorage.setItem(`gp_cloudinary_${field === 'cloudName' ? 'name' : 'preset'}`, clean);
-            };
+            const filteredProducts = useMemo(() => {
+                return products.filter(p => {
+                    const matchCat = selectedCategory === Category.TODOS || p.category === selectedCategory;
+                    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
+                    return matchCat && matchSearch;
+                });
+            }, [products, selectedCategory, search]);
 
             return (
                 <div className="min-h-screen">
                     {toast && <div className="toast-notification">{toast}</div>}
-                    
-                    <Navbar 
-                        cartCount={cart.reduce((a,b)=>a+b.quantity,0)} 
-                        onOpenCart={() => setIsCartOpen(true)} 
-                        isVisible={isCatalogOpen} 
-                        isEditMode={isEditMode}
-                        onLongPressStart={handleLongPressStart}
-                        onLongPressEnd={handleLongPressEnd}
-                        isPressing={isPressing}
-                        onOpenAdminModal={() => { setEditingProduct(null); setForm({ name: '', price: '', category: Category.BRINCOS, images: [] }); setUploadError(null); setIsAdminModalOpen(true); }}
-                        cloudStatus={cloudStatus}
-                        isSyncing={isSyncing}
-                    />
 
+                    {/* NAVBAR */}
+                    {isCatalogOpen && (
+                        <nav className="sticky top-0 z-[100] bg-black/95 backdrop-blur-xl border-b border-white/5 py-6 px-6 flex justify-between items-center">
+                            <div className="relative cursor-pointer" onMouseDown={handleStartPress} onMouseUp={handleEndPress} onTouchStart={handleStartPress} onTouchEnd={handleEndPress}>
+                                <h1 className="text-2xl font-serif font-bold text-[#d4af37] uppercase tracking-widest">{BRAND_NAME}</h1>
+                                <div className="long-press-indicator" style={{ width: isPressing ? '100%' : '0' }}></div>
+                            </div>
+                            <div className="flex items-center gap-6">
+                                {isEditMode && <button onClick={() => setIsAdminModalOpen(true)} className="text-[10px] border border-[#d4af37] text-[#d4af37] px-4 py-2 uppercase font-bold tracking-widest">Painel Gestão</button>}
+                                <button onClick={() => setIsCartOpen(true)} className="relative p-2 bg-white/5 rounded-full">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" strokeWidth="1.5"/></svg>
+                                    {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-[#d4af37] text-black text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.reduce((a,b)=>a+b.quantity,0)}</span>}
+                                </button>
+                            </div>
+                        </nav>
+                    )}
+
+                    {/* LANDING OU CATALOGO */}
                     {!isCatalogOpen ? (
-                        <header className="h-screen relative flex items-center justify-center text-center px-6 overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
-                            <img src="https://images.unsplash.com/photo-1515562141207-7a18b5ce7142?auto=format&fit=crop&q=80&w=1920" className="absolute inset-0 w-full h-full object-cover grayscale brightness-[0.35] scale-105 animate-[pulse_10s_infinite]" />
-                            <div className="relative z-20 animate-fade-in max-w-5xl">
-                                <div 
-                                    className="cursor-pointer mb-12 inline-block select-none group"
-                                    onMouseDown={handleLongPressStart} onMouseUp={handleLongPressEnd} onTouchStart={handleLongPressStart} onTouchEnd={handleLongPressEnd}
-                                >
-                                    <h2 className="text-8xl md:text-[14rem] font-serif lux-3d-title font-bold leading-none tracking-tighter">Gold Paty</h2>
+                        <header className="h-screen flex items-center justify-center relative overflow-hidden px-6 text-center">
+                            <div className="absolute inset-0 bg-black/60 z-10" />
+                            <img src="https://images.unsplash.com/photo-1515562141207-7a18b5ce7142?q=80&w=2000" className="absolute inset-0 w-full h-full object-cover grayscale" />
+                            <div className="relative z-20 animate-fade-in">
+                                <div className="relative inline-block mb-10" onMouseDown={handleStartPress} onMouseUp={handleEndPress} onTouchStart={handleStartPress} onTouchEnd={handleEndPress}>
+                                    <h2 className="text-7xl md:text-9xl font-serif font-bold lux-3d-title leading-tight">{BRAND_NAME}</h2>
                                     <div className="long-press-indicator" style={{ width: isPressing ? '100%' : '0' }}></div>
                                 </div>
-                                <p className="tracking-[1.5em] uppercase text-[12px] md:text-[14px] mb-20 text-white/40 font-black">Fine Jewelry • Exclusividade • Luxo</p>
-                                <button onClick={() => setIsCatalogOpen(true)} className="bg-[#d4af37] text-black px-20 py-8 font-black uppercase text-[11px] tracking-[0.4em] hover:scale-110 transition-all shadow-[0_30px_60px_rgba(212,175,55,0.3)] active:scale-95">Descobrir Boutique</button>
+                                <p className="text-white/40 tracking-[1em] uppercase text-xs mb-16">Semi-Joias de Luxo</p>
+                                <button onClick={() => setIsCatalogOpen(true)} className="bg-[#d4af37] text-black px-12 py-6 font-bold uppercase tracking-widest hover:scale-105 transition-all">Explorar Coleção</button>
                             </div>
                         </header>
                     ) : (
-                        <main className="max-w-7xl mx-auto px-6 py-28 animate-fade-in">
-                            <div className="flex flex-col md:flex-row justify-between items-center mb-28 gap-12">
-                                <div className="flex flex-wrap gap-5 justify-center">
+                        <main className="max-w-7xl mx-auto px-6 py-20 animate-fade-in">
+                            <div className="flex flex-col md:flex-row justify-between gap-10 mb-20">
+                                <div className="flex flex-wrap gap-4 justify-center">
                                     {Object.values(Category).map(c => (
-                                        <button key={c} onClick={() => setSelectedCategory(c)} className={`px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border transition-all ${selectedCategory === c ? 'bg-[#d4af37] border-[#d4af37] text-black shadow-[0_15px_30px_rgba(212,175,55,0.2)]' : 'border-white/10 text-gray-600 hover:text-white hover:border-white/30'}`}>{c}</button>
+                                        <button key={c} onClick={() => setSelectedCategory(c)} className={`px-6 py-2 rounded-full text-[10px] font-bold uppercase border transition-all ${selectedCategory === c ? 'bg-[#d4af37] text-black border-[#d4af37]' : 'border-white/10 text-white/40'}`}>{c}</button>
                                     ))}
                                 </div>
-                                <div className="flex items-center gap-5 w-full md:w-auto bg-white/[0.03] px-6 py-3 border border-white/5 focus-within:border-[#d4af37]/40 transition-all rounded-sm">
-                                    <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeWidth="2.5"/></svg>
-                                    <input type="text" placeholder="BUSCAR PEÇA..." value={search} onChange={e => setSearch(e.target.value)} className="bg-transparent outline-none py-2 text-[10px] tracking-[0.3em] w-full md:w-72 font-black text-white" />
-                                </div>
+                                <input type="text" placeholder="Buscar joia..." className="bg-white/5 border border-white/10 p-4 text-xs uppercase tracking-widest outline-none focus:border-[#d4af37] transition-all w-full md:w-80" onChange={e => setSearch(e.target.value)} />
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-24">
-                                {filtered.length === 0 ? (
-                                    <div className="col-span-full py-52 text-center text-gray-800 italic font-serif text-2xl tracking-widest opacity-40">Sua nova peça favorita chegará em breve...</div>
-                                ) : filtered.map(p => (
-                                    <ProductCard 
-                                        key={p.id} 
-                                        product={p} 
-                                        isEditMode={isEditMode} 
-                                        onEdit={(prod) => { setEditingProduct(prod); setForm({ ...prod }); setUploadError(null); setIsAdminModalOpen(true); }} 
-                                        onDelete={handleDelete} 
-                                        onAddToCart={addToCart} 
-                                    />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+                                {filteredProducts.map(p => (
+                                    <div key={p.id} className="bg-[#0a0a0a] border border-white/5 group relative">
+                                        <div className="aspect-[3/4] overflow-hidden bg-black relative">
+                                            <img src={p.images[0]} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-6">
+                                                {isEditMode ? (
+                                                    <div className="flex flex-col gap-2 w-full">
+                                                        <button onClick={() => { setEditingProduct(p); setForm({...p}); setIsAdminModalOpen(true); }} className="bg-white text-black py-3 text-[10px] font-bold uppercase">Editar</button>
+                                                        <button onClick={async () => { if(confirm("Excluir?")) { const nl = products.filter(x => x.id !== p.id); setProducts(nl); await syncToCloud(nl); } }} className="bg-red-600 text-white py-3 text-[10px] font-bold uppercase">Excluir</button>
+                                                    </div>
+                                                ) : (
+                                                    <button onClick={() => { 
+                                                        setCart(prev => {
+                                                            const exists = prev.find(x => x.id === p.id);
+                                                            if(exists) return prev.map(x => x.id === p.id ? {...x, quantity: x.quantity + 1} : x);
+                                                            return [...prev, {...p, quantity: 1}];
+                                                        });
+                                                        showToast("Adicionado!");
+                                                    }} className="bg-[#d4af37] text-black w-full py-4 text-[10px] font-bold uppercase tracking-widest">Adicionar à Sacola</button>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="p-6">
+                                            <p className="text-[#d4af37] text-[8px] uppercase font-bold tracking-widest mb-2">{p.category}</p>
+                                            <h3 className="text-white font-medium uppercase text-sm mb-2">{p.name}</h3>
+                                            <p className="text-xl font-serif">R$ {parseFloat(p.price).toFixed(2)}</p>
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         </main>
                     )}
 
+                    {/* MODAL SENHA */}
+                    {showPasswordModal && (
+                        <div className="fixed inset-0 z-[500] bg-black flex items-center justify-center p-6">
+                            <form className="max-w-xs w-full space-y-8 text-center" onSubmit={handleLogin}>
+                                <h2 className="text-[#d4af37] font-serif text-5xl font-bold uppercase tracking-widest leading-tight">Painel<br/>Gold Boss</h2>
+                                <input 
+                                    type="password" 
+                                    autoFocus 
+                                    className="admin-input text-center text-3xl tracking-[0.5em]" 
+                                    placeholder="••••" 
+                                    value={passwordInput}
+                                    onChange={e => setPasswordInput(e.target.value)} 
+                                />
+                                <button type="submit" className="w-full bg-[#d4af37] text-black py-4 font-bold uppercase tracking-widest active:scale-95 transition-all">Entrar</button>
+                                <button type="button" onClick={() => setShowPasswordModal(false)} className="text-white/20 uppercase text-[10px] block w-full">Voltar</button>
+                            </form>
+                        </div>
+                    )}
+
+                    {/* MODAL GESTÃO */}
                     {isAdminModalOpen && (
-                        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 backdrop-blur-xl">
-                            <div className="absolute inset-0 bg-black/95" onClick={() => setIsAdminModalOpen(false)} />
-                            <div className="relative bg-[#0a0a0a] border border-white/10 w-full max-w-2xl p-12 shadow-[0_50px_120px_rgba(0,0,0,1)] animate-fade-in max-h-[90vh] overflow-y-auto custom-scroll rounded-sm">
-                                <div className="flex justify-between items-start mb-12">
-                                    <div>
-                                        <h3 className="text-3xl font-serif text-[#d4af37] uppercase tracking-[0.2em] font-bold mb-3">Gestão de Acervo</h3>
-                                        <p className="text-[10px] text-gray-600 uppercase tracking-[0.4em] font-black">Digital Boutique Admin</p>
-                                    </div>
-                                    <button onClick={() => setIsAdminModalOpen(false)} className="text-gray-700 text-5xl font-thin hover:text-white transition-colors">&times;</button>
-                                </div>
-                                
-                                <div className="bg-white/[0.02] p-8 mb-12 border border-white/5 rounded-sm space-y-8">
-                                    <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#d4af37]">Configuração de Mídia (Cloudinary)</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div>
-                                            <label className="text-[9px] text-gray-600 uppercase font-black block mb-3 tracking-widest">Cloud Name</label>
-                                            <input className="admin-input text-xs" placeholder="Ex: h99uknvq" value={cloudinaryConfig.cloudName} onChange={e => updateCloudConfig('cloudName', e.target.value)} />
-                                        </div>
-                                        <div>
-                                            <label className="text-[9px] text-gray-600 uppercase font-black block mb-3 tracking-widest">Unsigned Preset</label>
-                                            <input className="admin-input text-xs" placeholder="Ex: ml_default" value={cloudinaryConfig.uploadPreset} onChange={e => updateCloudConfig('uploadPreset', e.target.value)} />
-                                        </div>
-                                    </div>
-                                    <p className="text-[9px] text-gray-700 uppercase leading-relaxed font-black tracking-tighter">Instrução: O preset deve estar em modo <span className="text-white">'Unsigned'</span> no painel de controle do Cloudinary para permitir uploads sem servidor.</p>
+                        <div className="fixed inset-0 z-[600] bg-black/95 backdrop-blur-xl p-6 overflow-y-auto">
+                            <div className="max-w-2xl mx-auto py-10">
+                                <div className="flex justify-between items-center mb-12">
+                                    <h2 className="text-3xl font-serif text-[#d4af37] font-bold uppercase tracking-widest">Controle Gold Boss</h2>
+                                    <button onClick={() => { setIsAdminModalOpen(false); setEditingProduct(null); setForm({ name: '', price: '', category: Category.BRINCOS, images: [] }); }} className="text-white text-5xl font-thin">&times;</button>
                                 </div>
 
-                                {uploadError && (
-                                    <div className="bg-red-950/20 border border-red-500/30 text-red-400 p-6 rounded-sm mb-10 text-[11px] flex items-start gap-4 uppercase font-bold tracking-tight">
-                                        <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-                                        <span>{uploadError}</span>
+                                <div className="bg-white/5 p-8 border border-white/10 mb-10 space-y-6">
+                                    <h3 className="text-[10px] font-bold uppercase text-[#d4af37] tracking-widest">Configurações Técnicas</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <input className="admin-input text-xs" placeholder="WhatsApp (DDI+DDD+Número)" value={settings.whatsapp} onChange={e => {
+                                            const v = e.target.value.trim();
+                                            setSettings(prev => ({...prev, whatsapp: v}));
+                                            localStorage.setItem('gb_whatsapp', v);
+                                        }} />
+                                        <input className="admin-input text-xs" placeholder="ID do JSONBin" value={settings.binId} onChange={e => {
+                                            const v = e.target.value.trim();
+                                            setSettings(prev => ({...prev, binId: v}));
+                                            localStorage.setItem('gb_bin_id', v);
+                                        }} />
+                                        <input className="admin-input text-xs" placeholder="Cloudinary: Cloud Name" value={settings.cloudName} onChange={e => {
+                                            const v = e.target.value.trim();
+                                            setSettings(prev => ({...prev, cloudName: v}));
+                                            localStorage.setItem('gb_cloud_name', v);
+                                        }} />
+                                        <input className="admin-input text-xs" placeholder="Cloudinary: Upload Preset" value={settings.uploadPreset} onChange={e => {
+                                            const v = e.target.value.trim();
+                                            setSettings(prev => ({...prev, uploadPreset: v}));
+                                            localStorage.setItem('gb_upload_preset', v);
+                                        }} />
                                     </div>
-                                )}
+                                </div>
 
-                                <form onSubmit={handleSaveProduct} className="space-y-14">
-                                    <div>
-                                        <label className="text-[10px] uppercase tracking-widest text-gray-500 font-black mb-8 block">Fotos da Joia (Máx 4 • HD)</label>
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-10">
-                                            {form.images.map((img, idx) => (
-                                                <div key={idx} className="relative aspect-[3/4] border border-white/10 bg-black rounded-sm overflow-hidden group shadow-xl">
-                                                    <img src={img} className="w-full h-full object-cover" />
-                                                    <div className="cloudinary-badge">HD Ativo</div>
-                                                    <button type="button" onClick={() => setForm(prev => ({...prev, images: prev.images.filter((_,i)=>i!==idx)}))} className="absolute top-2 right-2 bg-red-950 text-white w-7 h-7 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-sm">&times;</button>
-                                                </div>
-                                            ))}
-                                            {form.images.length < 4 && (
-                                                <div className="image-upload-area aspect-[3/4] bg-white/[0.02]" onClick={() => fileInputRef.current.click()}>
-                                                    <svg className="w-10 h-10 text-[#d4af37] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeWidth="1" /></svg>
-                                                    <span className="text-[9px] uppercase font-black text-gray-600 tracking-tighter">{isSyncing ? 'Sincronizando...' : 'Adicionar Foto'}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" multiple onChange={handleFileChange} />
-                                    </div>
-
-                                    <div className="grid grid-cols-1 gap-12">
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-widest text-gray-700 mb-4 block font-black">Identificação da Peça</label>
-                                            <input className="admin-input" placeholder="Ex: Anel Solitário Brilhante Ouro" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-2 gap-12">
-                                            <div>
-                                                <label className="text-[10px] uppercase tracking-widest text-gray-700 mb-4 block font-black">Preço de Venda (R$)</label>
-                                                <input type="number" step="0.01" className="admin-input font-serif text-xl" placeholder="0,00" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
+                                <form className="space-y-8" onSubmit={async e => {
+                                    e.preventDefault();
+                                    if(form.images.length === 0) return alert("Adicione ao menos uma foto.");
+                                    const pData = {...form, price: parseFloat(form.price), id: editingProduct ? editingProduct.id : Date.now().toString()};
+                                    const nl = editingProduct ? products.map(x => x.id === editingProduct.id ? pData : x) : [...products, pData];
+                                    setProducts(nl);
+                                    await syncToCloud(nl);
+                                    setIsAdminModalOpen(false);
+                                    setEditingProduct(null);
+                                    setForm({ name: '', price: '', category: Category.BRINCOS, images: [] });
+                                    showToast("Atualizado com sucesso!");
+                                }}>
+                                    <h3 className="text-[10px] font-bold uppercase text-[#d4af37] tracking-widest">Fotos (Máximo 4)</h3>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {form.images.map((img, i) => (
+                                            <div key={i} className="aspect-[3/4] relative border border-white/10">
+                                                <img src={img} className="w-full h-full object-cover" />
+                                                <button type="button" onClick={() => setForm(prev => ({...prev, images: prev.images.filter((_, idx) => idx !== i)}))} className="absolute top-1 right-1 bg-red-600 text-white w-5 h-5 flex items-center justify-center text-xs rounded-full">&times;</button>
                                             </div>
-                                            <div>
-                                                <label className="text-[10px] uppercase tracking-widest text-gray-700 mb-4 block font-black">Coleção</label>
-                                                <select className="admin-input" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
-                                                    {Object.values(Category).filter(c => c !== 'Todos').map(c => <option key={c} value={c}>{c}</option>)}
-                                                </select>
+                                        ))}
+                                        {form.images.length < 4 && (
+                                            <div className="image-upload-area aspect-[3/4]" onClick={() => fileInputRef.current.click()}>
+                                                <span className="text-[10px] font-bold text-white/20 uppercase">+ FOTO</span>
                                             </div>
+                                        )}
+                                    </div>
+                                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" multiple onChange={handleFileUpload} />
+
+                                    <div className="space-y-4">
+                                        <input className="admin-input" placeholder="Nome da Peça" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <input type="number" step="0.01" className="admin-input" placeholder="Preço" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
+                                            <select className="admin-input" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
+                                                {Object.values(Category).filter(c => c !== 'Todos').map(c => <option key={c} value={c}>{c}</option>)}
+                                            </select>
                                         </div>
                                     </div>
 
-                                    <button type="submit" disabled={isSyncing} className="w-full bg-[#d4af37] text-black py-9 font-black uppercase text-[12px] tracking-[0.5em] shadow-[0_30px_60px_rgba(212,175,55,0.2)] disabled:opacity-30 hover:brightness-110 active:scale-[0.98] transition-all">
-                                        {isSyncing ? "Processando..." : (editingProduct ? "Salvar Alterações" : "Publicar Joia")}
+                                    <button disabled={isSyncing} className="w-full bg-[#d4af37] text-black py-6 font-bold uppercase tracking-widest disabled:opacity-50">
+                                        {isSyncing ? 'Sincronizando...' : (editingProduct ? 'Salvar Alterações' : 'Adicionar ao Catálogo')}
                                     </button>
                                 </form>
                             </div>
                         </div>
                     )}
 
-                    {showPasswordModal && (
-                        <div className="fixed inset-0 z-[600] flex items-center justify-center p-6 bg-black">
-                            <form onSubmit={handlePasswordSubmit} className="max-w-sm w-full space-y-16 text-center animate-fade-in">
-                                <div className="space-y-6">
-                                    <h3 className="text-[#d4af37] font-serif text-6xl uppercase tracking-[0.2em] font-bold">Admin</h3>
-                                    <p className="text-[11px] text-gray-600 uppercase tracking-[0.4em] font-black">Chave de Segurança</p>
-                                </div>
-                                <div className="space-y-8">
-                                    <input type="password" autoFocus className="admin-input text-center text-4xl tracking-[0.8em] border-none bg-white/[0.04] p-8" placeholder="••••" value={passwordInput} onChange={e => setPasswordInput(e.target.value)} />
-                                    <button type="submit" className="w-full bg-[#d4af37] text-black py-7 font-black uppercase text-[11px] tracking-[0.3em]">Autenticar</button>
-                                </div>
-                                <button type="button" onClick={() => setShowPasswordModal(false)} className="text-gray-800 text-[11px] uppercase font-black tracking-[0.3em] hover:text-white transition-colors">Voltar</button>
-                            </form>
-                        </div>
-                    )}
-
+                    {/* CARRINHO */}
                     {isCartOpen && (
                         <div className="fixed inset-0 z-[400] flex justify-end">
-                            <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl" onClick={() => setIsCartOpen(false)} />
-                            <div className="relative w-full max-w-lg bg-[#050505] h-full flex flex-col animate-slide-left border-l border-white/10 p-12">
-                                <div className="flex justify-between items-center mb-20">
-                                    <h3 className="text-4xl font-serif text-[#d4af37] uppercase tracking-widest font-bold">Sua Sacola</h3>
-                                    <button onClick={() => setIsCartOpen(false)} className="text-gray-800 text-6xl font-thin hover:text-white transition-colors">&times;</button>
+                            <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setIsCartOpen(false)} />
+                            <div className="relative w-full max-w-md bg-[#050505] h-full flex flex-col p-10 animate-slide-left shadow-2xl">
+                                <div className="flex justify-between items-center mb-10">
+                                    <h2 className="text-3xl font-serif text-[#d4af37] font-bold uppercase">Sua Sacola</h2>
+                                    <button onClick={() => setIsCartOpen(false)} className="text-4xl font-thin">&times;</button>
                                 </div>
-                                <div className="flex-grow overflow-y-auto space-y-14 pr-6 custom-scroll">
+                                <div className="flex-grow overflow-y-auto custom-scroll pr-2 space-y-8">
                                     {cart.length === 0 ? (
-                                        <div className="text-center mt-40 text-gray-900 italic font-serif text-2xl tracking-[0.2em] opacity-40">Sua curadoria está vazia...</div>
-                                    ) : cart.map(i => (
-                                        <div key={i.id} className="flex gap-10 border-b border-white/[0.05] pb-14 group">
-                                            <div className="w-36 h-48 flex-shrink-0 border border-white/10 overflow-hidden shadow-2xl rounded-sm">
-                                                <img src={i.images?.[0]} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                            </div>
-                                            <div className="flex-grow flex flex-col justify-center">
-                                                <p className="text-[12px] font-black uppercase tracking-[0.3em] mb-4 text-white/80">{i.name}</p>
-                                                <p className="text-[#d4af37] text-3xl font-bold font-serif mb-8">R$ {parseFloat(i.price).toFixed(2)}</p>
-                                                <div className="flex items-center gap-10">
-                                                    <div className="flex items-center bg-white/[0.05] p-2 rounded-sm border border-white/5">
-                                                        <button onClick={() => setCart(prev => prev.map(p => p.id === i.id ? {...p, quantity: Math.max(0, p.quantity - 1)} : p).filter(p => p.quantity > 0))} className="text-gray-600 w-12 h-12 flex items-center justify-center hover:text-white text-3xl transition-colors font-thin">-</button>
-                                                        <span className="text-sm font-black w-10 text-center text-white">{i.quantity}</span>
-                                                        <button onClick={() => setCart(prev => prev.map(p => p.id === i.id ? {...p, quantity: p.quantity + 1} : p))} className="text-gray-600 w-12 h-12 flex items-center justify-center hover:text-white text-3xl transition-colors font-thin">+</button>
-                                                    </div>
-                                                    <button onClick={() => setCart(prev => prev.filter(p => p.id !== i.id))} className="text-[10px] uppercase text-red-900 font-black tracking-[0.3em] hover:text-red-600 transition-colors">Remover</button>
+                                        <div className="h-full flex items-center justify-center text-white/20 italic">Vazia...</div>
+                                    ) : cart.map(item => (
+                                        <div key={item.id} className="flex gap-4 border-b border-white/5 pb-8">
+                                            <img src={item.images[0]} className="w-20 h-24 object-cover" />
+                                            <div className="flex-grow">
+                                                <h4 className="text-xs font-bold uppercase mb-2">{item.name}</h4>
+                                                <p className="text-[#d4af37] font-serif mb-4">R$ {parseFloat(item.price).toFixed(2)}</p>
+                                                <div className="flex items-center gap-4">
+                                                    <button onClick={() => setCart(prev => prev.map(x => x.id === item.id ? {...x, quantity: Math.max(0, x.quantity - 1)} : x).filter(x => x.quantity > 0))} className="bg-white/5 w-8 h-8 rounded-full border border-white/10">-</button>
+                                                    <span className="text-xs font-bold">{item.quantity}</span>
+                                                    <button onClick={() => setCart(prev => prev.map(x => x.id === item.id ? {...x, quantity: x.quantity + 1} : x))} className="bg-white/5 w-8 h-8 rounded-full border border-white/10">+</button>
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                                 {cart.length > 0 && (
-                                    <div className="mt-auto pt-20 border-t border-white/10">
-                                        <div className="flex justify-between items-end mb-16">
-                                            <span className="text-gray-800 uppercase text-[14px] font-black tracking-[0.6em]">Investimento Total</span>
-                                            <span className="font-bold text-5xl text-[#d4af37] font-serif">R$ {cart.reduce((a,b)=>a+(parseFloat(b.price)*b.quantity), 0).toFixed(2)}</span>
+                                    <div className="pt-10 border-t border-white/10 mt-10">
+                                        <div className="flex justify-between items-center mb-10">
+                                            <span className="uppercase text-[10px] font-bold text-white/40 tracking-widest">Total do Pedido</span>
+                                            <span className="text-3xl font-serif text-[#d4af37]">R$ {cart.reduce((a,b)=>a+(b.price*b.quantity), 0).toFixed(2)}</span>
                                         </div>
                                         <button onClick={() => {
-                                            const text = `✨ *SOLICITAÇÃO DE ENCOMENDA - GOLD PATY* ✨\n\n${cart.map(i => `💍 *${i.name}*\nQuant: ${i.quantity} un | Valor: R$ ${(i.price * i.quantity).toFixed(2)}`).join('\n\n')}\n\n━━━━━━━━━━━━━━━━━━━━\n💰 *VALOR TOTAL: R$ ${cart.reduce((a,b)=>a+(parseFloat(b.price)*b.quantity), 0).toFixed(2)}*\n━━━━━━━━━━━━━━━━━━━━\n\nOlá! Gostaria de prosseguir com o pedido destas joias.`;
-                                            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
-                                        }} className="w-full bg-[#25D366] text-white py-9 font-black uppercase text-[12px] tracking-[0.5em] flex items-center justify-center gap-8 hover:brightness-110 active:scale-95 transition-all shadow-[0_30px_70px_rgba(37,211,102,0.25)]">
-                                            <span>Finalizar via WhatsApp</span>
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                                        </button>
+                                            const whatsapp = settings.whatsapp;
+                                            if(!whatsapp) return alert("WhatsApp não configurado no painel administrativo.");
+                                            const text = `*Gold Boss - Novo Pedido*:\n\n${cart.map(i => `• ${i.name} (Qtd: ${i.quantity}) - R$ ${(i.price * i.quantity).toFixed(2)}`).join('\n')}\n\n*Total: R$ ${cart.reduce((a,b)=>a+(b.price*b.quantity),0).toFixed(2)}*`;
+                                            window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
+                                        }} className="w-full bg-[#25D366] text-white py-6 font-bold uppercase tracking-widest shadow-xl active:scale-95 transition-all">Finalizar no WhatsApp</button>
                                     </div>
                                 )}
                             </div>
                         </div>
                     )}
-
-                    <footer className="py-52 text-center border-t border-white/[0.05] bg-black">
-                        <div className="max-w-7xl mx-auto px-6">
-                            <h2 className="text-6xl font-serif lux-3d-title mb-12 font-bold leading-none tracking-tighter">Gold Paty</h2>
-                            <p className="text-[11px] tracking-[1.2em] uppercase font-black text-gray-800 mb-20">Areté & Exclusividade Digital</p>
-                            <div className="flex justify-center gap-20 text-[12px] uppercase tracking-[0.5em] text-gray-800 font-black mb-32">
-                                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" className="hover:text-white transition-all underline underline-offset-8 decoration-white/10">WhatsApp</a>
-                                <span className="hover:text-white transition-all underline underline-offset-8 decoration-white/10">Instagram</span>
-                                <span className="hover:text-white transition-all underline underline-offset-8 decoration-white/10">Sobre Nós</span>
-                            </div>
-                            <p className="text-[10px] text-gray-900 uppercase tracking-[0.3em] font-black">© 2026 Gold Paty • Crafted for Excellence • Boutique de Semi-Joias Premium</p>
-                        </div>
-                    </footer>
                 </div>
             );
         };
