@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gold Boss | Catálogo de Semi-Joias</title>
+    <title>Gold Paty | Catálogo de Semi-Joias</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -108,14 +108,17 @@
         const { useState, useMemo, useEffect, useRef } = React;
 
         // ==========================================
-        // CONFIGURAÇÕES DA MARCA
+        // CONFIGURAÇÕES GLOBAIS (CONSOLIDADAS)
         // ==========================================
-        const BRAND_NAME = "Gold Boss";
-        const WHATSAPP_NUMBER_DEFAULT = ""; 
-        const ADMIN_PASSWORD = "adm2026"; // Senha atualizada conforme solicitação
-
-        const CONFIG_NUVEM = {
-            apiKey: '$2a$10$RxtN.VwYLRsGcmoCji08oeL2di9W0D4tyrBZe/vIV77N665ALQ9Vi'
+        const BRAND_NAME = "Gold Paty";
+        const ADMIN_PASSWORD = "adm2026";
+        
+        const INITIAL_KEYS = {
+            cloudName: 'dtpmnfe53',
+            uploadPreset: 'd4sif2ks',
+            binId: '698cd7ebd0ea881f40b2e79c',
+            apiKey: '$2a$10$D4Sd5VXrNrc1TAmEIfEgh.TnEc9wr2VJzzJvpMpTaQdQIx3wAFwS.',
+            whatsapp: '5511985440625' // Sugestão de formato: 55 + DDD + Número
         };
 
         const Category = {
@@ -146,12 +149,11 @@
             const [isSyncing, setIsSyncing] = useState(false);
             const [toast, setToast] = useState(null);
             
-            // Persistência local das configurações de servidor
             const [settings, setSettings] = useState({
-                cloudName: localStorage.getItem('gb_cloud_name') || '',
-                uploadPreset: localStorage.getItem('gb_upload_preset') || '',
-                binId: localStorage.getItem('gb_bin_id') || '',
-                whatsapp: localStorage.getItem('gb_whatsapp') || WHATSAPP_NUMBER_DEFAULT
+                cloudName: localStorage.getItem('gp_cloud_name') || INITIAL_KEYS.cloudName,
+                uploadPreset: localStorage.getItem('gp_upload_preset') || INITIAL_KEYS.uploadPreset,
+                binId: localStorage.getItem('gp_bin_id') || INITIAL_KEYS.binId,
+                whatsapp: localStorage.getItem('gp_whatsapp') || INITIAL_KEYS.whatsapp
             });
 
             const pressTimer = useRef(null);
@@ -181,51 +183,72 @@
                 if (passwordInput === ADMIN_PASSWORD) {
                     setIsEditMode(true);
                     setShowPasswordModal(false);
-                    setIsAdminModalOpen(true); // Abre o painel automaticamente
-                    setIsCatalogOpen(true);    // Entra no catálogo
+                    setIsAdminModalOpen(true);
+                    setIsCatalogOpen(true);
                     setPasswordInput('');
-                    showToast("Bem-vindo, Boss!");
+                    showToast("Bem-vinda, Paty!");
                 } else {
-                    alert("Acesso Negado.");
+                    alert("Senha incorreta.");
                 }
             };
 
             const loadData = async () => {
                 const targetBin = settings.binId;
-                if (!targetBin) return;
-                setIsSyncing(true);
-                try {
-                    const res = await fetch(`https://api.jsonbin.io/v3/b/${targetBin}/latest`, {
-                        headers: { 'X-Master-Key': CONFIG_NUVEM.apiKey }
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        setProducts(data.record || []);
-                    }
-                } catch (e) {
-                    const local = localStorage.getItem('gb_local_data');
-                    if (local) setProducts(JSON.parse(local));
-                }
-                setIsSyncing(false);
-            };
-
-            useEffect(() => { loadData(); }, [settings.binId]);
-
-            const syncToCloud = async (newList) => {
-                const targetBin = settings.binId;
                 if (!targetBin) {
-                    localStorage.setItem('gb_local_data', JSON.stringify(newList));
+                    const local = localStorage.getItem('gp_local_data');
+                    if (local) {
+                        try {
+                            const parsed = JSON.parse(local);
+                            setProducts(Array.isArray(parsed) ? parsed : []);
+                        } catch(e) { setProducts([]); }
+                    }
                     return;
                 }
                 setIsSyncing(true);
                 try {
+                    const res = await fetch(`https://api.jsonbin.io/v3/b/${targetBin}/latest`, {
+                        headers: { 'X-Master-Key': INITIAL_KEYS.apiKey }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const list = Array.isArray(data.record) ? data.record : [];
+                        setProducts(list);
+                        localStorage.setItem('gp_local_data', JSON.stringify(list));
+                    } else {
+                        throw new Error('Falha ao carregar do servidor');
+                    }
+                } catch (e) {
+                    const local = localStorage.getItem('gp_local_data');
+                    if (local) {
+                        try {
+                            const parsed = JSON.parse(local);
+                            setProducts(Array.isArray(parsed) ? parsed : []);
+                        } catch(err) { setProducts([]); }
+                    }
+                }
+                setIsSyncing(false);
+            };
+
+            useEffect(() => { 
+                loadData(); 
+            }, [settings.binId]);
+
+            const syncToCloud = async (newList) => {
+                const listToSync = Array.isArray(newList) ? newList : [];
+                localStorage.setItem('gp_local_data', JSON.stringify(listToSync));
+                const targetBin = settings.binId;
+                if (!targetBin) return;
+                
+                setIsSyncing(true);
+                try {
                     await fetch(`https://api.jsonbin.io/v3/b/${targetBin}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'X-Master-Key': CONFIG_NUVEM.apiKey },
-                        body: JSON.stringify(newList)
+                        headers: { 'Content-Type': 'application/json', 'X-Master-Key': INITIAL_KEYS.apiKey },
+                        body: JSON.stringify(listToSync)
                     });
-                    localStorage.setItem('gb_local_data', JSON.stringify(newList));
-                } catch (e) { alert("Falha na sincronização."); }
+                } catch (e) { 
+                    console.error("Falha cloud sync:", e); 
+                }
                 setIsSyncing(false);
             };
 
@@ -233,11 +256,6 @@
                 const files = Array.from(e.target.files);
                 if (files.length === 0) return;
                 
-                if (!settings.cloudName || !settings.uploadPreset) {
-                    alert("Configure o Cloudinary no painel primeiro!");
-                    return;
-                }
-
                 setIsSyncing(true);
                 const uploads = files.map(async (file) => {
                     const formData = new FormData();
@@ -250,22 +268,55 @@
                         });
                         const data = await res.json();
                         return data.secure_url || null;
-                    } catch { return null; }
+                    } catch (err) { 
+                        return null; 
+                    }
                 });
 
                 const results = await Promise.all(uploads);
                 const valid = results.filter(r => r !== null);
+                if(valid.length === 0) alert("Erro no upload. Verifique as chaves do Cloudinary.");
                 setForm(prev => ({ ...prev, images: [...prev.images, ...valid].slice(0, 4) }));
                 setIsSyncing(false);
+                if (fileInputRef.current) fileInputRef.current.value = "";
             };
 
             const filteredProducts = useMemo(() => {
-                return products.filter(p => {
+                const safeProducts = Array.isArray(products) ? products : [];
+                return safeProducts.filter(p => {
                     const matchCat = selectedCategory === Category.TODOS || p.category === selectedCategory;
-                    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
+                    const matchSearch = (p.name || '').toLowerCase().includes(search.toLowerCase());
                     return matchCat && matchSearch;
                 });
             }, [products, selectedCategory, search]);
+
+            const handleSaveProduct = async (e) => {
+                if(e) e.preventDefault();
+                if(form.images.length === 0) return alert("Adicione ao menos uma foto.");
+                
+                const pData = {
+                    ...form, 
+                    price: parseFloat(form.price) || 0, 
+                    id: editingProduct ? editingProduct.id : Date.now().toString()
+                };
+                
+                const safeProducts = Array.isArray(products) ? products : [];
+                const newList = editingProduct 
+                    ? safeProducts.map(x => x.id === editingProduct.id ? pData : x) 
+                    : [pData, ...safeProducts];
+                
+                setProducts(newList);
+                
+                setIsAdminModalOpen(false);
+                setEditingProduct(null);
+                setForm({ name: '', price: '', category: Category.BRINCOS, images: [] });
+                
+                setSelectedCategory(Category.TODOS);
+                setSearch('');
+                
+                await syncToCloud(newList);
+                showToast(editingProduct ? "Peça atualizada!" : "Peça cadastrada!");
+            };
 
             return (
                 <div className="min-h-screen">
@@ -279,7 +330,11 @@
                                 <div className="long-press-indicator" style={{ width: isPressing ? '100%' : '0' }}></div>
                             </div>
                             <div className="flex items-center gap-6">
-                                {isEditMode && <button onClick={() => setIsAdminModalOpen(true)} className="text-[10px] border border-[#d4af37] text-[#d4af37] px-4 py-2 uppercase font-bold tracking-widest">Painel Gestão</button>}
+                                {isEditMode && (
+                                    <button onClick={() => setIsAdminModalOpen(true)} className="text-[10px] border border-[#d4af37] text-[#d4af37] px-4 py-2 uppercase font-bold tracking-widest hover:bg-[#d4af37] hover:text-black transition-all">
+                                        Painel Gestão
+                                    </button>
+                                )}
                                 <button onClick={() => setIsCartOpen(true)} className="relative p-2 bg-white/5 rounded-full">
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" strokeWidth="1.5"/></svg>
                                     {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-[#d4af37] text-black text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.reduce((a,b)=>a+b.quantity,0)}</span>}
@@ -299,7 +354,7 @@
                                     <div className="long-press-indicator" style={{ width: isPressing ? '100%' : '0' }}></div>
                                 </div>
                                 <p className="text-white/40 tracking-[1em] uppercase text-xs mb-16">Semi-Joias de Luxo</p>
-                                <button onClick={() => setIsCatalogOpen(true)} className="bg-[#d4af37] text-black px-12 py-6 font-bold uppercase tracking-widest hover:scale-105 transition-all">Explorar Coleção</button>
+                                <button onClick={() => setIsCatalogOpen(true)} className="bg-[#d4af37] text-black px-12 py-6 font-bold uppercase tracking-widest hover:scale-105 transition-all shadow-2xl">Acessar Coleção</button>
                             </div>
                         </header>
                     ) : (
@@ -310,19 +365,25 @@
                                         <button key={c} onClick={() => setSelectedCategory(c)} className={`px-6 py-2 rounded-full text-[10px] font-bold uppercase border transition-all ${selectedCategory === c ? 'bg-[#d4af37] text-black border-[#d4af37]' : 'border-white/10 text-white/40'}`}>{c}</button>
                                     ))}
                                 </div>
-                                <input type="text" placeholder="Buscar joia..." className="bg-white/5 border border-white/10 p-4 text-xs uppercase tracking-widest outline-none focus:border-[#d4af37] transition-all w-full md:w-80" onChange={e => setSearch(e.target.value)} />
+                                <input 
+                                    type="text" 
+                                    placeholder="Procurar peça..." 
+                                    value={search}
+                                    className="bg-white/5 border border-white/10 p-4 text-xs uppercase tracking-widest outline-none focus:border-[#d4af37] transition-all w-full md:w-80" 
+                                    onChange={e => setSearch(e.target.value)} 
+                                />
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
                                 {filteredProducts.map(p => (
-                                    <div key={p.id} className="bg-[#0a0a0a] border border-white/5 group relative">
+                                    <div key={p.id} className="bg-[#0a0a0a] border border-white/5 group relative animate-fade-in">
                                         <div className="aspect-[3/4] overflow-hidden bg-black relative">
-                                            <img src={p.images[0]} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" />
+                                            <img src={p.images[0] || 'https://via.placeholder.com/300x400?text=Sem+Imagem'} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" />
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-6">
                                                 {isEditMode ? (
                                                     <div className="flex flex-col gap-2 w-full">
                                                         <button onClick={() => { setEditingProduct(p); setForm({...p}); setIsAdminModalOpen(true); }} className="bg-white text-black py-3 text-[10px] font-bold uppercase">Editar</button>
-                                                        <button onClick={async () => { if(confirm("Excluir?")) { const nl = products.filter(x => x.id !== p.id); setProducts(nl); await syncToCloud(nl); } }} className="bg-red-600 text-white py-3 text-[10px] font-bold uppercase">Excluir</button>
+                                                        <button onClick={async () => { if(confirm("Remover peça?")) { const nl = products.filter(x => x.id !== p.id); setProducts(nl); await syncToCloud(nl); showToast("Peça removida!"); } }} className="bg-red-600 text-white py-3 text-[10px] font-bold uppercase">Excluir</button>
                                                     </div>
                                                 ) : (
                                                     <button onClick={() => { 
@@ -339,11 +400,14 @@
                                         <div className="p-6">
                                             <p className="text-[#d4af37] text-[8px] uppercase font-bold tracking-widest mb-2">{p.category}</p>
                                             <h3 className="text-white font-medium uppercase text-sm mb-2">{p.name}</h3>
-                                            <p className="text-xl font-serif">R$ {parseFloat(p.price).toFixed(2)}</p>
+                                            <p className="text-xl font-serif text-[#d4af37]">R$ {parseFloat(p.price || 0).toFixed(2)}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
+                            {filteredProducts.length === 0 && !isSyncing && (
+                                <div className="text-center py-20 opacity-20 italic">Ainda não há peças nesta categoria...</div>
+                            )}
                         </main>
                     )}
 
@@ -351,7 +415,7 @@
                     {showPasswordModal && (
                         <div className="fixed inset-0 z-[500] bg-black flex items-center justify-center p-6">
                             <form className="max-w-xs w-full space-y-8 text-center" onSubmit={handleLogin}>
-                                <h2 className="text-[#d4af37] font-serif text-5xl font-bold uppercase tracking-widest leading-tight">Painel<br/>Gold Boss</h2>
+                                <h2 className="text-[#d4af37] font-serif text-5xl font-bold uppercase tracking-widest leading-tight">Admin<br/>Gold Paty</h2>
                                 <input 
                                     type="password" 
                                     autoFocus 
@@ -361,64 +425,49 @@
                                     onChange={e => setPasswordInput(e.target.value)} 
                                 />
                                 <button type="submit" className="w-full bg-[#d4af37] text-black py-4 font-bold uppercase tracking-widest active:scale-95 transition-all">Entrar</button>
-                                <button type="button" onClick={() => setShowPasswordModal(false)} className="text-white/20 uppercase text-[10px] block w-full">Voltar</button>
+                                <button type="button" onClick={() => setShowPasswordModal(false)} className="text-white/20 uppercase text-[10px] block w-full tracking-widest">Sair</button>
                             </form>
                         </div>
                     )}
 
                     {/* MODAL GESTÃO */}
                     {isAdminModalOpen && (
-                        <div className="fixed inset-0 z-[600] bg-black/95 backdrop-blur-xl p-6 overflow-y-auto">
+                        <div className="fixed inset-0 z-[600] bg-black/95 backdrop-blur-xl p-6 overflow-y-auto custom-scroll">
                             <div className="max-w-2xl mx-auto py-10">
                                 <div className="flex justify-between items-center mb-12">
-                                    <h2 className="text-3xl font-serif text-[#d4af37] font-bold uppercase tracking-widest">Controle Gold Boss</h2>
+                                    <h2 className="text-3xl font-serif text-[#d4af37] font-bold uppercase">Painel de Gestão</h2>
                                     <button onClick={() => { setIsAdminModalOpen(false); setEditingProduct(null); setForm({ name: '', price: '', category: Category.BRINCOS, images: [] }); }} className="text-white text-5xl font-thin">&times;</button>
                                 </div>
 
                                 <div className="bg-white/5 p-8 border border-white/10 mb-10 space-y-6">
-                                    <h3 className="text-[10px] font-bold uppercase text-[#d4af37] tracking-widest">Configurações Técnicas</h3>
+                                    <h3 className="text-[10px] font-bold uppercase text-[#d4af37] tracking-widest">Configurações Ativas</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <input className="admin-input text-xs" placeholder="WhatsApp (DDI+DDD+Número)" value={settings.whatsapp} onChange={e => {
-                                            const v = e.target.value.trim();
-                                            setSettings(prev => ({...prev, whatsapp: v}));
-                                            localStorage.setItem('gb_whatsapp', v);
-                                        }} />
-                                        <input className="admin-input text-xs" placeholder="ID do JSONBin" value={settings.binId} onChange={e => {
-                                            const v = e.target.value.trim();
-                                            setSettings(prev => ({...prev, binId: v}));
-                                            localStorage.setItem('gb_bin_id', v);
-                                        }} />
-                                        <input className="admin-input text-xs" placeholder="Cloudinary: Cloud Name" value={settings.cloudName} onChange={e => {
-                                            const v = e.target.value.trim();
-                                            setSettings(prev => ({...prev, cloudName: v}));
-                                            localStorage.setItem('gb_cloud_name', v);
-                                        }} />
-                                        <input className="admin-input text-xs" placeholder="Cloudinary: Upload Preset" value={settings.uploadPreset} onChange={e => {
-                                            const v = e.target.value.trim();
-                                            setSettings(prev => ({...prev, uploadPreset: v}));
-                                            localStorage.setItem('gb_upload_preset', v);
-                                        }} />
+                                        <div className="space-y-1">
+                                            <label className="text-[8px] uppercase text-white/40">WhatsApp Proprietário</label>
+                                            <input className="admin-input text-xs" value={settings.whatsapp} onChange={e => {
+                                                const v = e.target.value.trim();
+                                                setSettings(prev => ({...prev, whatsapp: v}));
+                                                localStorage.setItem('gp_whatsapp', v);
+                                            }} />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[8px] uppercase text-white/40">ID do Catálogo (Bin ID)</label>
+                                            <input className="admin-input text-xs" value={settings.binId} onChange={e => {
+                                                const v = e.target.value.trim();
+                                                setSettings(prev => ({...prev, binId: v}));
+                                                localStorage.setItem('gp_bin_id', v);
+                                            }} />
+                                        </div>
                                     </div>
                                 </div>
 
-                                <form className="space-y-8" onSubmit={async e => {
-                                    e.preventDefault();
-                                    if(form.images.length === 0) return alert("Adicione ao menos uma foto.");
-                                    const pData = {...form, price: parseFloat(form.price), id: editingProduct ? editingProduct.id : Date.now().toString()};
-                                    const nl = editingProduct ? products.map(x => x.id === editingProduct.id ? pData : x) : [...products, pData];
-                                    setProducts(nl);
-                                    await syncToCloud(nl);
-                                    setIsAdminModalOpen(false);
-                                    setEditingProduct(null);
-                                    setForm({ name: '', price: '', category: Category.BRINCOS, images: [] });
-                                    showToast("Atualizado com sucesso!");
-                                }}>
-                                    <h3 className="text-[10px] font-bold uppercase text-[#d4af37] tracking-widest">Fotos (Máximo 4)</h3>
+                                <form className="space-y-8" onSubmit={handleSaveProduct}>
+                                    <h3 className="text-[10px] font-bold uppercase text-[#d4af37] tracking-widest">Fotos (Máx 4)</h3>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         {form.images.map((img, i) => (
-                                            <div key={i} className="aspect-[3/4] relative border border-white/10">
+                                            <div key={i} className="aspect-[3/4] relative border border-white/10 group overflow-hidden bg-black">
                                                 <img src={img} className="w-full h-full object-cover" />
-                                                <button type="button" onClick={() => setForm(prev => ({...prev, images: prev.images.filter((_, idx) => idx !== i)}))} className="absolute top-1 right-1 bg-red-600 text-white w-5 h-5 flex items-center justify-center text-xs rounded-full">&times;</button>
+                                                <button type="button" onClick={() => setForm(prev => ({...prev, images: prev.images.filter((_, idx) => idx !== i)}))} className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 flex items-center justify-center text-xs rounded-full">&times;</button>
                                             </div>
                                         ))}
                                         {form.images.length < 4 && (
@@ -432,15 +481,15 @@
                                     <div className="space-y-4">
                                         <input className="admin-input" placeholder="Nome da Peça" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
                                         <div className="grid grid-cols-2 gap-4">
-                                            <input type="number" step="0.01" className="admin-input" placeholder="Preço" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
+                                            <input type="number" step="0.01" className="admin-input" placeholder="Preço (R$)" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
                                             <select className="admin-input" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
                                                 {Object.values(Category).filter(c => c !== 'Todos').map(c => <option key={c} value={c}>{c}</option>)}
                                             </select>
                                         </div>
                                     </div>
 
-                                    <button disabled={isSyncing} className="w-full bg-[#d4af37] text-black py-6 font-bold uppercase tracking-widest disabled:opacity-50">
-                                        {isSyncing ? 'Sincronizando...' : (editingProduct ? 'Salvar Alterações' : 'Adicionar ao Catálogo')}
+                                    <button disabled={isSyncing} className="w-full bg-[#d4af37] text-black py-6 font-bold uppercase tracking-widest disabled:opacity-50 transition-all shadow-2xl">
+                                        {isSyncing ? 'Sincronizando...' : (editingProduct ? 'Salvar Alteração' : 'Cadastrar na Loja')}
                                     </button>
                                 </form>
                             </div>
@@ -453,22 +502,22 @@
                             <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setIsCartOpen(false)} />
                             <div className="relative w-full max-w-md bg-[#050505] h-full flex flex-col p-10 animate-slide-left shadow-2xl">
                                 <div className="flex justify-between items-center mb-10">
-                                    <h2 className="text-3xl font-serif text-[#d4af37] font-bold uppercase">Sua Sacola</h2>
+                                    <h2 className="text-3xl font-serif text-[#d4af37] font-bold">Sua Sacola</h2>
                                     <button onClick={() => setIsCartOpen(false)} className="text-4xl font-thin">&times;</button>
                                 </div>
                                 <div className="flex-grow overflow-y-auto custom-scroll pr-2 space-y-8">
                                     {cart.length === 0 ? (
-                                        <div className="h-full flex items-center justify-center text-white/20 italic">Vazia...</div>
+                                        <div className="h-full flex items-center justify-center text-white/20 italic">Sacola vazia...</div>
                                     ) : cart.map(item => (
                                         <div key={item.id} className="flex gap-4 border-b border-white/5 pb-8">
-                                            <img src={item.images[0]} className="w-20 h-24 object-cover" />
+                                            <img src={item.images[0] || 'https://via.placeholder.com/100x120'} className="w-20 h-24 object-cover rounded-sm" />
                                             <div className="flex-grow">
-                                                <h4 className="text-xs font-bold uppercase mb-2">{item.name}</h4>
-                                                <p className="text-[#d4af37] font-serif mb-4">R$ {parseFloat(item.price).toFixed(2)}</p>
+                                                <h4 className="text-xs font-bold uppercase mb-2 tracking-tight">{item.name}</h4>
+                                                <p className="text-[#d4af37] font-serif mb-4">R$ {parseFloat(item.price || 0).toFixed(2)}</p>
                                                 <div className="flex items-center gap-4">
-                                                    <button onClick={() => setCart(prev => prev.map(x => x.id === item.id ? {...x, quantity: Math.max(0, x.quantity - 1)} : x).filter(x => x.quantity > 0))} className="bg-white/5 w-8 h-8 rounded-full border border-white/10">-</button>
+                                                    <button onClick={() => setCart(prev => prev.map(x => x.id === item.id ? {...x, quantity: Math.max(0, x.quantity - 1)} : x).filter(x => x.quantity > 0))} className="bg-white/5 w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">-</button>
                                                     <span className="text-xs font-bold">{item.quantity}</span>
-                                                    <button onClick={() => setCart(prev => prev.map(x => x.id === item.id ? {...x, quantity: x.quantity + 1} : x))} className="bg-white/5 w-8 h-8 rounded-full border border-white/10">+</button>
+                                                    <button onClick={() => setCart(prev => prev.map(x => x.id === item.id ? {...x, quantity: x.quantity + 1} : x))} className="bg-white/5 w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">+</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -477,15 +526,15 @@
                                 {cart.length > 0 && (
                                     <div className="pt-10 border-t border-white/10 mt-10">
                                         <div className="flex justify-between items-center mb-10">
-                                            <span className="uppercase text-[10px] font-bold text-white/40 tracking-widest">Total do Pedido</span>
+                                            <span className="uppercase text-[10px] font-bold text-white/40 tracking-widest">Valor Final</span>
                                             <span className="text-3xl font-serif text-[#d4af37]">R$ {cart.reduce((a,b)=>a+(b.price*b.quantity), 0).toFixed(2)}</span>
                                         </div>
                                         <button onClick={() => {
                                             const whatsapp = settings.whatsapp;
-                                            if(!whatsapp) return alert("WhatsApp não configurado no painel administrativo.");
-                                            const text = `*Gold Boss - Novo Pedido*:\n\n${cart.map(i => `• ${i.name} (Qtd: ${i.quantity}) - R$ ${(i.price * i.quantity).toFixed(2)}`).join('\n')}\n\n*Total: R$ ${cart.reduce((a,b)=>a+(b.price*b.quantity),0).toFixed(2)}*`;
+                                            if(!whatsapp) return alert("Erro: WhatsApp não configurado.");
+                                            const text = `*Gold Paty - Novo Pedido*:\n\n${cart.map(i => `• ${i.name} (Qtd: ${i.quantity}) - R$ ${(i.price * i.quantity).toFixed(2)}`).join('\n')}\n\n*Total: R$ ${cart.reduce((a,b)=>a+(b.price*b.quantity),0).toFixed(2)}*`;
                                             window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
-                                        }} className="w-full bg-[#25D366] text-white py-6 font-bold uppercase tracking-widest shadow-xl active:scale-95 transition-all">Finalizar no WhatsApp</button>
+                                        }} className="w-full bg-[#25D366] text-white py-6 font-bold uppercase tracking-widest shadow-xl transition-all hover:brightness-110 active:scale-95">Finalizar Pedido via WhatsApp</button>
                                     </div>
                                 )}
                             </div>
