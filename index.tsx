@@ -1,0 +1,1 @@
+// Arquivo mantido vazio. Toda a aplicação foi consolidada no index.html para deploy facilitado no GitHub Pages.

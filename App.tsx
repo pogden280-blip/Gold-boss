@@ -1,0 +1,1 @@
+// Removido - Lógica movida para index.tsx

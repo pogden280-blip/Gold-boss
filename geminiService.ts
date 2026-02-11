@@ -1,0 +1,1 @@
+// Removido - Funcionalidade de consultoria por IA desativada a pedido do usuário.
