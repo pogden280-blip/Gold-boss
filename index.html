@@ -163,11 +163,11 @@
         const { useState, useMemo, useEffect, useRef } = React;
 
         const CONFIG_NUVEM = {
-            binId: '69869a37ae596e708f173ec4',
-            apiKey: '$2a$10$RxtN.VwYLRsGcmoCji08oeL2di9W0D4tyrBZe/vIV77N665ALQ9Vi'
+            binId: '698cd7ebd0ea881f40b2e79c',
+            apiKey: '$2a$10$D4Sd5VXrNrc1TAmEIfEgh.TnEc9wr2VJzzJvpMpTaQdQIx3wAFwS.'
         };
 
-        const WHATSAPP_NUMBER = "5577981633924"; 
+        const WHATSAPP_NUMBER = "5562992138652"; 
         const ADMIN_PASSWORD = "adm2026"; 
 
         const Category = {
@@ -299,7 +299,7 @@
             
             // Cloudinary Config
             const [cloudinaryConfig, setCloudinaryConfig] = useState({
-                cloudName: localStorage.getItem('gp_cloudinary_name') || 'h99uknvq',
+                cloudName: localStorage.getItem('gp_cloudinary_name') || 'dtpmnfe53',
                 uploadPreset: localStorage.getItem('gp_cloudinary_preset') || ''
             });
 
@@ -704,7 +704,7 @@
                                             <span className="font-bold text-5xl text-[#d4af37] font-serif">R$ {cart.reduce((a,b)=>a+(parseFloat(b.price)*b.quantity), 0).toFixed(2)}</span>
                                         </div>
                                         <button onClick={() => {
-                                            const text = `✨ *SOLICITAÇÃO DE ENCOMENDA - GOLD PATY* ✨\n\n${cart.map(i => `💍 *${i.name}*\nQuant: ${i.quantity} un | Valor: R$ ${(i.price * i.quantity).toFixed(2)}`).join('\n\n')}\n\n━━━━━━━━━━━━━━━━━━━━\n💰 *VALOR TOTAL: R$ ${cart.reduce((a,b)=>a+(parseFloat(b.price)*b.quantity), 0).toFixed(2)}*\n━━━━━━━━━━━━━━━━━━━━\n\nOlá! Gostaria de prosseguir com o pedido destas joias.`;
+                                            const text = `✨ *SOLICITAÇÃO DE ENCOMENDA - GOLD BOSS* ✨\n\n${cart.map(i => `💍 *${i.name}*\nQuant: ${i.quantity} un | Valor: R$ ${(i.price * i.quantity).toFixed(2)}`).join('\n\n')}\n\n━━━━━━━━━━━━━━━━━━━━\n💰 *VALOR TOTAL: R$ ${cart.reduce((a,b)=>a+(parseFloat(b.price)*b.quantity), 0).toFixed(2)}*\n━━━━━━━━━━━━━━━━━━━━\n\nOlá! Gostaria de prosseguir com o pedido destas joias.`;
                                             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
                                         }} className="w-full bg-[#25D366] text-white py-9 font-black uppercase text-[12px] tracking-[0.5em] flex items-center justify-center gap-8 hover:brightness-110 active:scale-95 transition-all shadow-[0_30px_70px_rgba(37,211,102,0.25)]">
                                             <span>Finalizar via WhatsApp</span>
