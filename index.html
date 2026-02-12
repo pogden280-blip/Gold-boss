@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title> Gold boss | Boutique de Semi-Joias</title>
+    <title>Gold Boss | Boutique de Semi-Joias</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -11,11 +11,19 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --gold-primary: #d4af37;
+            --gold-light: #f5e6ad;
+            --gold-dark: #8a6d3b;
+            --gold-white: #ffffff;
+            --bg-deep: #050505;
+        }
+
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #050505;
+            background-color: var(--bg-deep);
             color: #ffffff;
             scroll-behavior: smooth;
             margin: 0;
@@ -26,137 +34,187 @@
         }
         h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
+        /* ALTO RELEVO 3D LOGO COM BRILHO INTENSO */
         .lux-3d-title {
-            background: linear-gradient(135deg, #f5e6ad 0%, #d4af37 25%, #8a6d3b 50%, #d4af37 75%, #f5e6ad 100%);
-            background-size: 200% auto;
+            background: linear-gradient(
+                90deg, 
+                var(--gold-dark) 0%, 
+                var(--gold-primary) 20%, 
+                var(--gold-white) 45%, 
+                var(--gold-white) 55%, 
+                var(--gold-primary) 80%, 
+                var(--gold-dark) 100%
+            );
+            background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite;
-            text-shadow: 0 10px 30px rgba(212, 175, 55, 0.1);
+            animation: luxury-shine 5s ease-in-out infinite;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+            text-shadow: 
+                1px 1px 0px #8a6d3b,
+                2px 2px 0px #7a5d2b,
+                3px 3px 0px #6a4d1b,
+                0px 0px 30px rgba(212, 175, 55, 0.3);
+            display: inline-block;
         }
-        @keyframes shine { to { background-position: 200% center; } }
+
+        @keyframes luxury-shine {
+            0% { background-position: 100% center; filter: brightness(1) drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
+            50% { filter: brightness(1.25) drop-shadow(0 0 40px rgba(212, 175, 55, 0.5)); }
+            100% { background-position: -100% center; filter: brightness(1) drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
+        }
+
+        /* CARTÃO EM RELEVO */
+        .lux-card {
+            background: linear-gradient(145deg, #0f0f0f, #050505);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            box-shadow: 
+                20px 20px 60px #030303,
+                -5px -5px 20px rgba(255,255,255,0.02);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .lux-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 
+                0 30px 70px rgba(0,0,0,0.9),
+                0 0 20px rgba(212, 175, 55, 0.1);
+        }
+
+        /* BOTÕES METALICOS */
+        .btn-gold-3d {
+            background: linear-gradient(145deg, var(--gold-primary), var(--gold-dark));
+            box-shadow: 
+                3px 3px 10px rgba(0,0,0,0.4),
+                inset 1px 1px 1px rgba(255,255,255,0.4);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-gold-3d:active {
+            box-shadow: 
+                inset 3px 3px 10px rgba(0,0,0,0.6),
+                0 1px 1px rgba(255,255,255,0.1);
+            transform: translateY(2px);
+        }
+        .btn-gold-3d::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+        }
+        .btn-gold-3d:hover::after {
+            left: 100%;
+        }
 
         .admin-input {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            padding: 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            padding: 16px;
             width: 100%;
-            border-radius: 4px;
+            border-radius: 2px;
             color: white;
             outline: none;
             transition: all 0.3s;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
         }
-        .admin-input:focus { border-color: #d4af37; background: rgba(255,255,255,0.07); }
+        .admin-input:focus { border-color: var(--gold-primary); background: rgba(255,255,255,0.05); }
 
         .long-press-indicator {
             position: absolute;
-            bottom: -8px;
+            bottom: -10px;
             left: 0;
-            height: 2px;
-            background: #d4af37;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
             width: 0;
             transition: width 3s linear;
+            box-shadow: 0 0 10px var(--gold-primary);
         }
         
         .status-dot {
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 6px;
+            margin-right: 8px;
+            box-shadow: 0 0 8px currentColor;
         }
-        .animate-pulse-sync { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 
-        .animate-slide-left { animation: slideLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes slideLeft { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--gold-primary); }
 
         .image-upload-area {
-            border: 1px dashed rgba(212, 175, 55, 0.3);
-            border-radius: 6px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
+            border: 1px dashed rgba(212, 175, 55, 0.2);
+            background: rgba(255,255,255,0.01);
             transition: all 0.3s;
-            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-        }
-        .image-upload-area:hover {
-            border-color: #d4af37;
-            background: rgba(212, 175, 55, 0.05);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
         .dot-indicator {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            transition: all 0.4s ease;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .dot-indicator.active {
-            background: #d4af37;
-            width: 18px;
+            background: var(--gold-primary);
+            width: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 15px var(--gold-primary);
         }
         
         .product-image-container img {
-            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .product-image-container:hover img {
-            transform: scale(1.08);
-        }
-        
-        .cloudinary-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #d4af37;
-            color: black;
-            font-size: 8px;
-            padding: 3px 6px;
-            border-radius: 2px;
-            font-weight: 900;
-            text-transform: uppercase;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            z-index: 5;
+            transform: scale(1.1) rotate(1deg);
         }
 
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
-        
         .toast-notification {
             position: fixed;
-            bottom: 30px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            background: #d4af37;
+            background: linear-gradient(145deg, var(--gold-light), var(--gold-primary));
             color: black;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-size: 10px;
-            font-weight: 900;
+            padding: 14px 30px;
+            border-radius: 2px;
+            font-size: 11px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.25em;
             z-index: 1000;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            animation: toastIn 0.5s cubic-bezier(0.16, 1, 0.3, 1), toastOut 0.5s cubic-bezier(0.16, 1, 0.3, 1) 2.5s forwards;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            border-bottom: 2px solid var(--gold-dark);
         }
-        @keyframes toastIn { from { bottom: -50px; opacity: 0; } to { bottom: 30px; opacity: 1; } }
-        @keyframes toastOut { from { bottom: 30px; opacity: 1; } to { bottom: -50px; opacity: 0; } }
+
+        /* TEXTURAS LUXO */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            z-index: 999;
+        }
     </style>
 </head>
 <body>
+    <div class="noise-overlay"></div>
     <div id="root"></div>
 
     <script type="text/babel">
@@ -168,7 +226,10 @@
         };
 
         const WHATSAPP_NUMBER = "5562992138652"; 
+        const WHATSAPP_FULL_URL = "https://api.whatsapp.com/send?phone=5562992138652&text=Ol%25C3%25A1%2C%2520gostaria%2520de%2520saber%2520mais%2520sobre%2520as%2520joias";
+        const INSTAGRAM_URL = "https://www.instagram.com/goldboss_oficial?igsh=MWh3azBrNXVuMjJ5dw%3D%3D&utm_source=qr";
         const ADMIN_PASSWORD = "adm2026"; 
+        const BRAND_NAME = "Gold Boss";
 
         const Category = {
             TODOS: 'Todos',
@@ -195,45 +256,49 @@
             };
 
             return (
-                <div className="group bg-[#0d0d0d] border border-white/5 overflow-hidden transition-all hover:border-[#d4af37]/40 relative animate-fade-in shadow-2xl">
+                <div className="lux-card group relative animate-fade-in">
                     <div className="aspect-[3/4] overflow-hidden bg-black relative cursor-pointer product-image-container" onClick={handleNext}>
                         {images.length > 0 ? (
                             <img 
                                 src={images[currentIdx]} 
-                                className={`w-full h-full object-cover transition-opacity duration-300 ${isFading ? 'opacity-0' : 'opacity-100'}`} 
+                                className={`w-full h-full object-cover transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`} 
                                 alt={product.name} 
-                                loading="lazy" 
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-800 text-[10px] uppercase tracking-[0.3em] font-bold">Sem Mídia</div>
+                            <div className="w-full h-full flex items-center justify-center text-white/5 uppercase tracking-[0.5em] font-bold">Sem Mídia</div>
                         )}
                         
                         {images.length > 1 && (
-                            <div className="absolute top-6 left-0 right-0 flex justify-center gap-1.5 pointer-events-none z-10">
+                            <div className="absolute top-6 left-0 right-0 flex justify-center gap-2 pointer-events-none z-10">
                                 {images.map((_, i) => (
                                     <div key={i} className={`dot-indicator ${i === currentIdx ? 'active' : ''}`} />
                                 ))}
                             </div>
                         )}
 
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
+
                         {isEditMode ? (
-                            <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm z-20 px-6">
-                                <button onClick={(e) => {e.stopPropagation(); onEdit(product);}} className="bg-white text-black px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.3em] w-full hover:bg-[#d4af37] transition-all">Editar Joia</button>
-                                <button onClick={(e) => {e.stopPropagation(); onDelete(product.id);}} className="bg-red-950 text-white px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.3em] w-full hover:bg-red-700 transition-all">Excluir</button>
+                            <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-all backdrop-blur-md z-20 px-8">
+                                <button onClick={(e) => {e.stopPropagation(); onEdit(product);}} className="btn-gold-3d text-black px-8 py-4 text-[10px] font-black uppercase tracking-[0.3em] w-full">Configurar</button>
+                                <button onClick={(e) => {e.stopPropagation(); onDelete(product.id);}} className="bg-red-950/40 border border-red-900 text-red-500 px-8 py-4 text-[10px] font-black uppercase tracking-[0.3em] w-full hover:bg-red-900 hover:text-white transition-all">Excluir</button>
                             </div>
                         ) : (
-                            <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-all duration-500 z-20">
-                                <button onClick={(e) => {e.stopPropagation(); onAddToCart(product);}} className="w-full bg-white text-black py-4.5 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#d4af37] shadow-2xl active:scale-95 transition-all">Adicionar à Sacola</button>
+                            <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-all duration-700 z-20">
+                                <button onClick={(e) => {e.stopPropagation(); onAddToCart(product);}} className="btn-gold-3d text-black w-full py-5 text-[10px] font-black uppercase tracking-[0.4em]">Adicionar à Sacola</button>
                             </div>
                         )}
                     </div>
-                    <div className="p-7">
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="text-[#d4af37] text-[9px] uppercase font-black tracking-[0.3em]">{product.category}</span>
-                            {images.length > 1 && <span className="text-white/20 text-[8px] font-black tracking-widest uppercase">Toque p/ trocar</span>}
+                    <div className="p-8">
+                        <div className="flex justify-between items-center mb-4">
+                            <span className="text-[#d4af37] text-[10px] uppercase font-black tracking-[0.3em] opacity-80">{product.category}</span>
+                            {images.length > 1 && <span className="text-white/10 text-[8px] font-black tracking-widest uppercase">Slide Ativo</span>}
                         </div>
-                        <h4 className="text-sm font-medium mb-1.5 truncate text-white/90 tracking-tight leading-relaxed uppercase">{product.name}</h4>
-                        <p className="font-bold text-xl text-white font-serif">R$ {parseFloat(product.price).toFixed(2)}</p>
+                        <h4 className="text-sm font-semibold mb-2 truncate text-white/90 tracking-widest leading-relaxed uppercase">{product.name}</h4>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-xs text-white/40 font-bold">R$</span>
+                            <p className="font-bold text-2xl text-[#d4af37] font-serif">{parseFloat(product.price).toFixed(2)}</p>
+                        </div>
                     </div>
                 </div>
             );
@@ -242,7 +307,7 @@
         const Navbar = ({ cartCount, onOpenCart, isVisible, isEditMode, onLongPressStart, onLongPressEnd, isPressing, onOpenAdminModal, cloudStatus, isSyncing }) => {
             if (!isVisible) return null;
             return (
-                <nav className="sticky top-0 z-[100] bg-[#050505]/95 backdrop-blur-2xl border-b border-white/5 py-6 px-6 shadow-2xl">
+                <nav className="sticky top-0 z-[100] bg-black/95 backdrop-blur-3xl border-b border-white/5 py-7 px-8 shadow-2xl">
                     <div className="flex justify-between items-center max-w-7xl mx-auto">
                         <div 
                             className="relative cursor-pointer select-none group"
@@ -250,27 +315,27 @@
                             onTouchStart={onLongPressStart} onTouchEnd={onLongPressEnd}
                         >
                             <div className="flex flex-col items-start">
-                                <div className="flex items-center gap-4">
-                                    <h1 className="text-2xl md:text-3xl font-serif font-bold tracking-[0.15em] text-[#d4af37] uppercase group-hover:brightness-125 transition-all">Gold boss</h1>
-                                    {isEditMode && <span className="bg-[#d4af37] text-black text-[8px] font-black px-2 py-0.5 rounded-sm">ADMIN</span>}
+                                <div className="flex items-center gap-5">
+                                    <h1 className="text-3xl font-serif font-black tracking-[0.1em] lux-3d-title uppercase group-hover:scale-[1.02] transition-transform">{BRAND_NAME}</h1>
+                                    {isEditMode && <span className="bg-[#d4af37] text-black text-[9px] font-black px-3 py-1 rounded-sm shadow-lg">BOSS PANEL</span>}
                                 </div>
-                                <div className="flex items-center text-[7px] uppercase tracking-[0.4em] text-gray-500 mt-1.5 font-bold">
-                                    <span className={`status-dot ${isSyncing ? 'bg-[#d4af37] animate-pulse-sync' : (cloudStatus === 'online' ? 'bg-emerald-500' : 'bg-red-600')}`}></span>
-                                    {isSyncing ? 'Sincronizando Mídia...' : (cloudStatus === 'online' ? 'Showroom Online' : 'Modo Offline')}
+                                <div className="flex items-center text-[8px] uppercase tracking-[0.5em] text-white/30 mt-2 font-bold">
+                                    <span className={`status-dot ${isSyncing ? 'text-[#d4af37] animate-pulse' : (cloudStatus === 'online' ? 'text-emerald-500' : 'text-red-600')}`} style={{backgroundColor: 'currentColor'}}></span>
+                                    {isSyncing ? 'Sincronizando...' : (cloudStatus === 'online' ? 'Showroom Gold' : 'Acervo Offline')}
                                 </div>
                             </div>
                             <div className="long-press-indicator" style={{ width: isPressing ? '100%' : '0' }}></div>
                         </div>
                         
-                        <div className="flex items-center gap-8">
+                        <div className="flex items-center gap-10">
                             {isEditMode && (
-                                <button onClick={onOpenAdminModal} className="hidden md:block text-[10px] font-black uppercase tracking-[0.3em] text-[#d4af37] bg-[#d4af37]/5 border border-[#d4af37]/20 px-6 py-3 hover:bg-[#d4af37] hover:text-black transition-all">Gestão</button>
+                                <button onClick={onOpenAdminModal} className="hidden md:block text-[10px] font-black uppercase tracking-[0.4em] text-[#d4af37] bg-white/[0.02] border border-[#d4af37]/20 px-8 py-4 hover:bg-[#d4af37] hover:text-black transition-all shadow-xl">Cadastrar Peça</button>
                             )}
-                            <button onClick={onOpenCart} className="relative p-3 group bg-white/5 rounded-full border border-white/5 hover:border-[#d4af37]/40 transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white/80 group-hover:text-[#d4af37] transition-colors">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+                            <button onClick={onOpenCart} className="relative p-4 group bg-white/5 rounded-full border border-white/5 hover:border-[#d4af37]/40 transition-all shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white/80 group-hover:text-[#d4af37] transition-colors">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
                                 </svg>
-                                {cartCount > 0 && <span className="absolute -top-1 -right-1 bg-[#d4af37] text-black text-[9px] w-5 h-5 flex items-center justify-center rounded-full font-black ring-2 ring-black">{cartCount}</span>}
+                                {cartCount > 0 && <span className="absolute -top-1 -right-1 bg-[#d4af37] text-black text-[10px] w-6 h-6 flex items-center justify-center rounded-full font-black ring-4 ring-black shadow-lg">{cartCount}</span>}
                             </button>
                         </div>
                     </div>
@@ -297,10 +362,9 @@
             const [uploadError, setUploadError] = useState(null);
             const [toast, setToast] = useState(null);
             
-            // Cloudinary Config
-            const [cloudinaryConfig, setCloudinaryConfig] = useState({
-                cloudName: localStorage.getItem('gp_cloudinary_name') || 'dtpmnfe53',
-                uploadPreset: localStorage.getItem('gp_cloudinary_preset') || ''
+            const [cloudinaryConfig] = useState({
+                cloudName: 'dtpmnfe53',
+                uploadPreset: 'd4sif2ks'
             });
 
             const pressTimer = useRef(null);
@@ -308,7 +372,7 @@
 
             const showToast = (msg) => {
                 setToast(msg);
-                setTimeout(() => setToast(null), 3000);
+                setTimeout(() => setToast(null), 3500);
             };
 
             const loadDataFromCloud = async () => {
@@ -316,23 +380,16 @@
                 try {
                     const timestamp = new Date().getTime();
                     const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG_NUVEM.binId}/latest?nocache=${timestamp}`, {
-                        headers: { 
-                            'X-Master-Key': CONFIG_NUVEM.apiKey,
-                            'Cache-Control': 'no-cache'
-                        }
+                        headers: { 'X-Master-Key': CONFIG_NUVEM.apiKey, 'Cache-Control': 'no-cache' }
                     });
-                    
                     if (res.ok) {
                         const data = await res.json();
                         if (data.record && Array.isArray(data.record)) {
                             setProducts(data.record);
                             setCloudStatus('online');
-                            localStorage.setItem('gp_products_v9', JSON.stringify(data.record));
                         }
                     }
                 } catch (e) {
-                    const local = localStorage.getItem('gp_products_v9');
-                    if (local) setProducts(JSON.parse(local));
                     setCloudStatus('offline');
                 }
                 setIsSyncing(false);
@@ -343,7 +400,7 @@
             const syncToCloud = async (updatedList) => {
                 setIsSyncing(true);
                 try {
-                    const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG_NUVEM.binId}`, {
+                    await fetch(`https://api.jsonbin.io/v3/b/${CONFIG_NUVEM.binId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -352,74 +409,37 @@
                         },
                         body: JSON.stringify(updatedList)
                     });
-                    
-                    if (res.ok) {
-                        localStorage.setItem('gp_products_v9', JSON.stringify(updatedList));
-                        setCloudStatus('online');
-                    }
+                    setCloudStatus('online');
                 } catch (e) { 
-                    alert("Erro crítico ao sincronizar servidor.");
+                    alert("Erro de conexão com o cofre digital.");
                 }
                 setIsSyncing(false);
             };
 
             const uploadToCloudinary = async (file) => {
-                setUploadError(null);
-                const { cloudName, uploadPreset } = cloudinaryConfig;
-
-                if (!cloudName || !uploadPreset) {
-                    setUploadError("⚠️ Configuração ausente: Informe Cloud Name e Preset Unsigned.");
-                    return null;
-                }
-
                 const formData = new FormData();
                 formData.append('file', file);
-                formData.append('upload_preset', uploadPreset);
-
+                formData.append('upload_preset', cloudinaryConfig.uploadPreset);
                 try {
-                    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`, {
                         method: 'POST',
                         body: formData
                     });
-                    
                     const data = await res.json();
-                    
-                    if (data.secure_url) {
-                        return data.secure_url;
-                    } else {
-                        let errorMsg = data.error?.message || "Erro no servidor de mídia.";
-                        if (errorMsg.includes("Unknown API key")) {
-                            errorMsg = "❌ Erro: Cloud Name incorreto ou Preset não é 'Unsigned'.";
-                        }
-                        setUploadError(errorMsg);
-                        return null;
-                    }
-                } catch (e) {
-                    setUploadError("❌ Falha de conexão com Cloudinary.");
-                    return null;
-                }
+                    return data.secure_url || null;
+                } catch (e) { return null; }
             };
 
             const handleFileChange = async (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length === 0) return;
-                
                 const remaining = 4 - form.images.length;
-                if (remaining <= 0) return alert("Máximo de 4 fotos atingido.");
-
+                if (remaining <= 0) return alert("Limite de fotos atingido.");
                 setIsSyncing(true);
-                const toProcess = files.slice(0, remaining);
-                
-                const uploadPromises = toProcess.map(file => uploadToCloudinary(file));
-                const results = await Promise.all(uploadPromises);
-                
-                const successfulUploads = results.filter(url => url !== null);
-                
-                if (successfulUploads.length > 0) {
-                    setForm(prev => ({ ...prev, images: [...prev.images, ...successfulUploads] }));
-                }
+                const results = await Promise.all(files.slice(0, remaining).map(f => uploadToCloudinary(f)));
+                const successful = results.filter(url => url !== null);
+                if (successful.length > 0) setForm(prev => ({ ...prev, images: [...prev.images, ...successful] }));
                 setIsSyncing(false);
-                e.target.value = ''; 
             };
 
             const handleLongPressStart = () => {
@@ -442,32 +462,21 @@
                     setShowPasswordModal(false);
                     setPasswordInput('');
                     if (!isCatalogOpen) setIsCatalogOpen(true);
-                    showToast("Painel de Gestão Ativo");
-                } else { alert("Senha Incorreta"); }
+                    showToast("Boss Autenticado");
+                } else { alert("Acesso Negado."); }
             };
 
             const handleSaveProduct = async (e) => {
                 e.preventDefault();
-                if (form.images.length === 0) return alert("A joia precisa de ao menos uma foto HD.");
-
+                if (form.images.length === 0) return alert("Adicione fotos da joia.");
                 const productData = { 
-                    name: form.name,
+                    ...form,
                     price: parseFloat(form.price),
-                    category: form.category,
-                    images: form.images,
                     id: editingProduct ? editingProduct.id : Date.now().toString()
                 };
-
-                let newList;
-                if (editingProduct) {
-                    newList = products.map(p => p.id === editingProduct.id ? productData : p);
-                } else {
-                    newList = [...products, productData];
-                }
-                
+                let newList = editingProduct ? products.map(p => p.id === editingProduct.id ? productData : p) : [productData, ...products];
                 setProducts(newList);
                 await syncToCloud(newList);
-                
                 setEditingProduct(null);
                 setForm({ name: '', price: '', category: Category.BRINCOS, images: [] });
                 setIsAdminModalOpen(false);
@@ -475,11 +484,11 @@
             };
 
             const handleDelete = async (id) => {
-                if (confirm("Deseja remover esta joia permanentemente da vitrine?")) {
+                if (confirm("Eliminar peça do acervo?")) {
                     const newList = products.filter(p => p.id !== id);
                     setProducts(newList);
                     await syncToCloud(newList);
-                    showToast("Joia Removida");
+                    showToast("Peça Eliminada");
                 }
             };
 
@@ -489,22 +498,15 @@
                     if (ex) return prev.map(i => i.id === prod.id ? {...i, quantity: i.quantity + 1} : i);
                     return [...prev, {...prod, quantity: 1}];
                 });
-                showToast("Adicionado à sacola");
+                showToast("Adicionado à Sacola");
             };
 
             const filtered = useMemo(() => 
-                products.filter(p => (selectedCategory === Category.TODOS || p.category === selectedCategory) && p.name.toLowerCase().includes(search.toLowerCase()))
+                (Array.isArray(products) ? products : []).filter(p => (selectedCategory === Category.TODOS || p.category === selectedCategory) && (p.name || '').toLowerCase().includes(search.toLowerCase()))
             , [selectedCategory, search, products]);
 
-            const updateCloudConfig = (field, val) => {
-                const clean = val.trim();
-                const newConfig = {...cloudinaryConfig, [field]: clean};
-                setCloudinaryConfig(newConfig);
-                localStorage.setItem(`gp_cloudinary_${field === 'cloudName' ? 'name' : 'preset'}`, clean);
-            };
-
             return (
-                <div className="min-h-screen">
+                <div className="min-h-screen pb-20">
                     {toast && <div className="toast-notification">{toast}</div>}
                     
                     <Navbar 
@@ -515,135 +517,113 @@
                         onLongPressStart={handleLongPressStart}
                         onLongPressEnd={handleLongPressEnd}
                         isPressing={isPressing}
-                        onOpenAdminModal={() => { setEditingProduct(null); setForm({ name: '', price: '', category: Category.BRINCOS, images: [] }); setUploadError(null); setIsAdminModalOpen(true); }}
+                        onOpenAdminModal={() => { setEditingProduct(null); setForm({ name: '', price: '', category: Category.BRINCOS, images: [] }); setIsAdminModalOpen(true); }}
                         cloudStatus={cloudStatus}
                         isSyncing={isSyncing}
                     />
 
                     {!isCatalogOpen ? (
                         <header className="h-screen relative flex items-center justify-center text-center px-6 overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
-                            <img src="https://images.unsplash.com/photo-1515562141207-7a18b5ce7142?auto=format&fit=crop&q=80&w=1920" className="absolute inset-0 w-full h-full object-cover grayscale brightness-[0.35] scale-105 animate-[pulse_10s_infinite]" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-black via-black/40 to-black z-10" />
+                            <img src="https://images.unsplash.com/photo-1515562141207-7a18b5ce7142?auto=format&fit=crop&q=100&w=1920" className="absolute inset-0 w-full h-full object-cover grayscale brightness-[0.4] scale-110" alt="Gold Boss Hero" />
                             <div className="relative z-20 animate-fade-in max-w-5xl">
                                 <div 
-                                    className="cursor-pointer mb-12 inline-block select-none group"
+                                    className="cursor-pointer mb-14 inline-block select-none group"
                                     onMouseDown={handleLongPressStart} onMouseUp={handleLongPressEnd} onTouchStart={handleLongPressStart} onTouchEnd={handleLongPressEnd}
                                 >
-                                    <h2 className="text-8xl md:text-[14rem] font-serif lux-3d-title font-bold leading-none tracking-tighter">Gold boss</h2>
+                                    <h2 className="text-8xl md:text-[15rem] font-serif lux-3d-title font-black leading-none tracking-tighter">{BRAND_NAME}</h2>
                                     <div className="long-press-indicator" style={{ width: isPressing ? '100%' : '0' }}></div>
                                 </div>
-                                <p className="tracking-[1.5em] uppercase text-[12px] md:text-[14px] mb-20 text-white/40 font-black">Fine Jewelry • Exclusividade • Luxo</p>
-                                <button onClick={() => setIsCatalogOpen(true)} className="bg-[#d4af37] text-black px-20 py-8 font-black uppercase text-[11px] tracking-[0.4em] hover:scale-110 transition-all shadow-[0_30px_60px_rgba(212,175,55,0.3)] active:scale-95">Descobrir Boutique</button>
+                                <p className="tracking-[1.5em] uppercase text-[12px] md:text-[14px] mb-24 text-white/30 font-black">Joias com banho de ouro 18k</p>
+                                <button onClick={() => setIsCatalogOpen(true)} className="btn-gold-3d text-black px-24 py-8 font-black uppercase text-[11px] tracking-[0.5em] shadow-2xl">Entrar no Showroom</button>
                             </div>
                         </header>
                     ) : (
-                        <main className="max-w-7xl mx-auto px-6 py-28 animate-fade-in">
-                            <div className="flex flex-col md:flex-row justify-between items-center mb-28 gap-12">
-                                <div className="flex flex-wrap gap-5 justify-center">
-                                    {Object.values(Category).map(c => (
-                                        <button key={c} onClick={() => setSelectedCategory(c)} className={`px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border transition-all ${selectedCategory === c ? 'bg-[#d4af37] border-[#d4af37] text-black shadow-[0_15px_30px_rgba(212,175,55,0.2)]' : 'border-white/10 text-gray-600 hover:text-white hover:border-white/30'}`}>{c}</button>
+                        <React.Fragment>
+                            <main className="max-w-7xl mx-auto px-8 py-32 animate-fade-in">
+                                <div className="flex flex-col md:flex-row justify-between items-center mb-32 gap-16">
+                                    <div className="flex flex-wrap gap-6 justify-center">
+                                        {Object.values(Category).map(c => (
+                                            <button key={c} onClick={() => setSelectedCategory(c)} className={`px-10 py-4 rounded-sm text-[11px] font-black uppercase tracking-[0.3em] border transition-all ${selectedCategory === c ? 'bg-[#d4af37] border-[#d4af37] text-black shadow-2xl scale-105' : 'border-white/5 text-white/20 hover:border-white/20 hover:text-white'}`}>{c}</button>
+                                        ))}
+                                    </div>
+                                    <div className="flex items-center gap-6 w-full md:w-auto bg-white/[0.02] px-8 py-5 border border-white/5 focus-within:border-[#d4af37]/40 transition-all rounded-sm shadow-inner">
+                                        <svg className="w-5 h-5 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeWidth="2.5"/></svg>
+                                        <input type="text" placeholder="BUSCAR NO ACERVO..." value={search} onChange={e => setSearch(e.target.value)} className="bg-transparent outline-none py-2 text-[11px] tracking-[0.4em] w-full md:w-80 font-black text-white placeholder:text-white/5" />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-32">
+                                    {filtered.length === 0 ? (
+                                        <div className="col-span-full py-60 text-center text-white/10 italic font-serif text-3xl tracking-[0.3em]">Preparando Coleção...</div>
+                                    ) : filtered.map(p => (
+                                        <ProductCard 
+                                            key={p.id} 
+                                            product={p} 
+                                            isEditMode={isEditMode} 
+                                            onEdit={(prod) => { setEditingProduct(prod); setForm({ ...prod }); setIsAdminModalOpen(true); }} 
+                                            onDelete={handleDelete} 
+                                            onAddToCart={addToCart} 
+                                        />
                                     ))}
                                 </div>
-                                <div className="flex items-center gap-5 w-full md:w-auto bg-white/[0.03] px-6 py-3 border border-white/5 focus-within:border-[#d4af37]/40 transition-all rounded-sm">
-                                    <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeWidth="2.5"/></svg>
-                                    <input type="text" placeholder="BUSCAR PEÇA..." value={search} onChange={e => setSearch(e.target.value)} className="bg-transparent outline-none py-2 text-[10px] tracking-[0.3em] w-full md:w-72 font-black text-white" />
+                            </main>
+                            <footer className="py-72 text-center bg-black">
+                                <div className="max-w-7xl mx-auto px-8">
+                                    <h2 className="text-8xl font-serif lux-3d-title mb-16 font-black leading-none tracking-tighter">{BRAND_NAME}</h2>
+                                    <p className="text-[12px] tracking-[1.5em] uppercase font-black text-white/10 mb-28">Exclusividade & Tradição em Cada Detalhe</p>
+                                    <div className="flex justify-center gap-24 text-[13px] uppercase tracking-[0.6em] text-white/20 font-black mb-40">
+                                        <a href={WHATSAPP_FULL_URL} target="_blank" className="hover:text-[#d4af37] transition-all">WhatsApp</a>
+                                        <a href={INSTAGRAM_URL} target="_blank" className="hover:text-[#d4af37] cursor-pointer transition-all">Instagram</a>
+                                        <span className="hover:text-[#d4af37] cursor-pointer transition-all">Privacidade</span>
+                                    </div>
+                                    <p className="text-[11px] text-white/5 uppercase tracking-[0.4em] font-black">© 2026 {BRAND_NAME} • Haute Joaillerie Premium</p>
                                 </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-24">
-                                {filtered.length === 0 ? (
-                                    <div className="col-span-full py-52 text-center text-gray-800 italic font-serif text-2xl tracking-widest opacity-40">Sua nova peça favorita chegará em breve...</div>
-                                ) : filtered.map(p => (
-                                    <ProductCard 
-                                        key={p.id} 
-                                        product={p} 
-                                        isEditMode={isEditMode} 
-                                        onEdit={(prod) => { setEditingProduct(prod); setForm({ ...prod }); setUploadError(null); setIsAdminModalOpen(true); }} 
-                                        onDelete={handleDelete} 
-                                        onAddToCart={addToCart} 
-                                    />
-                                ))}
-                            </div>
-                        </main>
+                            </footer>
+                        </React.Fragment>
                     )}
 
                     {isAdminModalOpen && (
-                        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 backdrop-blur-xl">
-                            <div className="absolute inset-0 bg-black/95" onClick={() => setIsAdminModalOpen(false)} />
-                            <div className="relative bg-[#0a0a0a] border border-white/10 w-full max-w-2xl p-12 shadow-[0_50px_120px_rgba(0,0,0,1)] animate-fade-in max-h-[90vh] overflow-y-auto custom-scroll rounded-sm">
-                                <div className="flex justify-between items-start mb-12">
-                                    <div>
-                                        <h3 className="text-3xl font-serif text-[#d4af37] uppercase tracking-[0.2em] font-bold mb-3">Gestão de Acervo</h3>
-                                        <p className="text-[10px] text-gray-600 uppercase tracking-[0.4em] font-black">Digital Boutique Admin</p>
-                                    </div>
-                                    <button onClick={() => setIsAdminModalOpen(false)} className="text-gray-700 text-5xl font-thin hover:text-white transition-colors">&times;</button>
+                        <div className="fixed inset-0 z-[500] flex items-center justify-center p-6 backdrop-blur-3xl">
+                            <div className="absolute inset-0 bg-black/98" onClick={() => setIsAdminModalOpen(false)} />
+                            <div className="relative bg-[#080808] border border-white/10 w-full max-w-2xl p-14 shadow-[0_60px_150px_rgba(0,0,0,1)] animate-fade-in max-h-[95vh] overflow-y-auto custom-scroll rounded-sm">
+                                <div className="flex justify-between items-start mb-16">
+                                    <h3 className="text-4xl font-serif text-[#d4af37] uppercase tracking-widest font-black">Digital Manager</h3>
+                                    <button onClick={() => setIsAdminModalOpen(false)} className="text-white/20 text-6xl font-thin hover:text-white transition-all">&times;</button>
                                 </div>
                                 
-                                <div className="bg-white/[0.02] p-8 mb-12 border border-white/5 rounded-sm space-y-8">
-                                    <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#d4af37]">Configuração de Mídia (Cloudinary)</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div>
-                                            <label className="text-[9px] text-gray-600 uppercase font-black block mb-3 tracking-widest">Cloud Name</label>
-                                            <input className="admin-input text-xs" placeholder="Ex: h99uknvq" value={cloudinaryConfig.cloudName} onChange={e => updateCloudConfig('cloudName', e.target.value)} />
-                                        </div>
-                                        <div>
-                                            <label className="text-[9px] text-gray-600 uppercase font-black block mb-3 tracking-widest">Unsigned Preset</label>
-                                            <input className="admin-input text-xs" placeholder="Ex: ml_default" value={cloudinaryConfig.uploadPreset} onChange={e => updateCloudConfig('uploadPreset', e.target.value)} />
-                                        </div>
-                                    </div>
-                                    <p className="text-[9px] text-gray-700 uppercase leading-relaxed font-black tracking-tighter">Instrução: O preset deve estar em modo <span className="text-white">'Unsigned'</span> no painel de controle do Cloudinary para permitir uploads sem servidor.</p>
-                                </div>
-
-                                {uploadError && (
-                                    <div className="bg-red-950/20 border border-red-500/30 text-red-400 p-6 rounded-sm mb-10 text-[11px] flex items-start gap-4 uppercase font-bold tracking-tight">
-                                        <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-                                        <span>{uploadError}</span>
-                                    </div>
-                                )}
-
-                                <form onSubmit={handleSaveProduct} className="space-y-14">
+                                <form onSubmit={handleSaveProduct} className="space-y-16">
                                     <div>
-                                        <label className="text-[10px] uppercase tracking-widest text-gray-500 font-black mb-8 block">Fotos da Joia (Máx 4 • HD)</label>
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-10">
+                                        <label className="text-[11px] uppercase tracking-[0.4em] text-white/20 font-black mb-10 block">Mídias da Joia (4 Max)</label>
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-12">
                                             {form.images.map((img, idx) => (
-                                                <div key={idx} className="relative aspect-[3/4] border border-white/10 bg-black rounded-sm overflow-hidden group shadow-xl">
+                                                <div key={idx} className="relative aspect-[3/4] border border-white/5 bg-black rounded-sm overflow-hidden group shadow-2xl">
                                                     <img src={img} className="w-full h-full object-cover" />
-                                                    <div className="cloudinary-badge">HD Ativo</div>
-                                                    <button type="button" onClick={() => setForm(prev => ({...prev, images: prev.images.filter((_,i)=>i!==idx)}))} className="absolute top-2 right-2 bg-red-950 text-white w-7 h-7 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-sm">&times;</button>
+                                                    <button type="button" onClick={() => setForm(prev => ({...prev, images: prev.images.filter((_,i)=>i!==idx)}))} className="absolute inset-0 bg-red-900/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity font-black text-xs tracking-widest uppercase">Remover</button>
                                                 </div>
                                             ))}
                                             {form.images.length < 4 && (
-                                                <div className="image-upload-area aspect-[3/4] bg-white/[0.02]" onClick={() => fileInputRef.current.click()}>
-                                                    <svg className="w-10 h-10 text-[#d4af37] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeWidth="1" /></svg>
-                                                    <span className="text-[9px] uppercase font-black text-gray-600 tracking-tighter">{isSyncing ? 'Sincronizando...' : 'Adicionar Foto'}</span>
+                                                <div className="image-upload-area aspect-[3/4]" onClick={() => fileInputRef.current.click()}>
+                                                    <svg className="w-12 h-12 text-[#d4af37]/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeWidth="1" /></svg>
+                                                    <span className="text-[10px] uppercase font-black text-white/20 tracking-widest">Adicionar</span>
                                                 </div>
                                             )}
                                         </div>
                                         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" multiple onChange={handleFileChange} />
                                     </div>
 
-                                    <div className="grid grid-cols-1 gap-12">
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-widest text-gray-700 mb-4 block font-black">Identificação da Peça</label>
-                                            <input className="admin-input" placeholder="Ex: Anel Solitário Brilhante Ouro" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
-                                        </div>
-                                        
+                                    <div className="space-y-12">
+                                        <input className="admin-input" placeholder="NOME DA PEÇA EXCLUSIVA" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
                                         <div className="grid grid-cols-2 gap-12">
-                                            <div>
-                                                <label className="text-[10px] uppercase tracking-widest text-gray-700 mb-4 block font-black">Preço de Venda (R$)</label>
-                                                <input type="number" step="0.01" className="admin-input font-serif text-xl" placeholder="0,00" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] uppercase tracking-widest text-gray-700 mb-4 block font-black">Coleção</label>
-                                                <select className="admin-input" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
-                                                    {Object.values(Category).filter(c => c !== 'Todos').map(c => <option key={c} value={c}>{c}</option>)}
-                                                </select>
-                                            </div>
+                                            <input type="number" step="0.01" className="admin-input font-serif text-2xl" placeholder="PREÇO" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
+                                            <select className="admin-input text-[11px] tracking-widest font-black" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
+                                                {Object.values(Category).filter(c => c !== 'Todos').map(c => <option key={c} value={c}>{c}</option>)}
+                                            </select>
                                         </div>
                                     </div>
 
-                                    <button type="submit" disabled={isSyncing} className="w-full bg-[#d4af37] text-black py-9 font-black uppercase text-[12px] tracking-[0.5em] shadow-[0_30px_60px_rgba(212,175,55,0.2)] disabled:opacity-30 hover:brightness-110 active:scale-[0.98] transition-all">
-                                        {isSyncing ? "Processando..." : (editingProduct ? "Salvar Alterações" : "Publicar Joia")}
+                                    <button type="submit" disabled={isSyncing} className="btn-gold-3d w-full text-black py-10 font-black uppercase text-[12px] tracking-[0.6em] shadow-2xl disabled:opacity-20">
+                                        {isSyncing ? "PROCESSANDO..." : "CONFIRMAR NO ACERVO"}
                                     </button>
                                 </form>
                             </div>
@@ -652,82 +632,65 @@
 
                     {showPasswordModal && (
                         <div className="fixed inset-0 z-[600] flex items-center justify-center p-6 bg-black">
-                            <form onSubmit={handlePasswordSubmit} className="max-w-sm w-full space-y-16 text-center animate-fade-in">
-                                <div className="space-y-6">
-                                    <h3 className="text-[#d4af37] font-serif text-6xl uppercase tracking-[0.2em] font-bold">Admin</h3>
-                                    <p className="text-[11px] text-gray-600 uppercase tracking-[0.4em] font-black">Chave de Segurança</p>
+                            <form onSubmit={handlePasswordSubmit} className="max-w-sm w-full space-y-20 text-center animate-fade-in">
+                                <h3 className="text-[#d4af37] font-serif text-7xl uppercase tracking-[0.2em] font-black lux-3d-title">BOSS ACCESS</h3>
+                                <div className="space-y-10">
+                                    <input type="password" autoFocus className="admin-input text-center text-5xl tracking-[0.8em] border-none bg-white/[0.03] p-10" placeholder="••••" value={passwordInput} onChange={e => setPasswordInput(e.target.value)} />
+                                    <button type="submit" className="btn-gold-3d w-full text-black py-8 font-black uppercase text-[11px] tracking-[0.5em]">Autenticar</button>
                                 </div>
-                                <div className="space-y-8">
-                                    <input type="password" autoFocus className="admin-input text-center text-4xl tracking-[0.8em] border-none bg-white/[0.04] p-8" placeholder="••••" value={passwordInput} onChange={e => setPasswordInput(e.target.value)} />
-                                    <button type="submit" className="w-full bg-[#d4af37] text-black py-7 font-black uppercase text-[11px] tracking-[0.3em]">Autenticar</button>
-                                </div>
-                                <button type="button" onClick={() => setShowPasswordModal(false)} className="text-gray-800 text-[11px] uppercase font-black tracking-[0.3em] hover:text-white transition-colors">Voltar</button>
+                                <button type="button" onClick={() => setShowPasswordModal(false)} className="text-white/10 text-[11px] uppercase font-black tracking-[0.4em] hover:text-white transition-all">Sair</button>
                             </form>
                         </div>
                     )}
 
                     {isCartOpen && (
                         <div className="fixed inset-0 z-[400] flex justify-end">
-                            <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl" onClick={() => setIsCartOpen(false)} />
-                            <div className="relative w-full max-w-lg bg-[#050505] h-full flex flex-col animate-slide-left border-l border-white/10 p-12">
-                                <div className="flex justify-between items-center mb-20">
-                                    <h3 className="text-4xl font-serif text-[#d4af37] uppercase tracking-widest font-bold">Sua Sacola</h3>
-                                    <button onClick={() => setIsCartOpen(false)} className="text-gray-800 text-6xl font-thin hover:text-white transition-colors">&times;</button>
+                            <div className="absolute inset-0 bg-black/98" onClick={() => setIsCartOpen(false)} />
+                            <div className="relative w-full max-w-xl bg-black h-full flex flex-col border-l border-white/5 p-16 shadow-[0_0_100px_rgba(0,0,0,1)]">
+                                <div className="flex justify-between items-center mb-24">
+                                    <h3 className="text-5xl font-serif text-[#d4af37] uppercase tracking-widest font-black">Sua Sacola</h3>
+                                    <button onClick={() => setIsCartOpen(false)} className="text-white/10 text-7xl font-thin hover:text-white transition-all">&times;</button>
                                 </div>
-                                <div className="flex-grow overflow-y-auto space-y-14 pr-6 custom-scroll">
+                                <div className="flex-grow overflow-y-auto space-y-16 pr-8 custom-scroll">
                                     {cart.length === 0 ? (
-                                        <div className="text-center mt-40 text-gray-900 italic font-serif text-2xl tracking-[0.2em] opacity-40">Sua curadoria está vazia...</div>
+                                        <div className="text-center mt-48 text-white/5 italic font-serif text-3xl tracking-[0.3em]">Sacola Vazia</div>
                                     ) : cart.map(i => (
-                                        <div key={i.id} className="flex gap-10 border-b border-white/[0.05] pb-14 group">
-                                            <div className="w-36 h-48 flex-shrink-0 border border-white/10 overflow-hidden shadow-2xl rounded-sm">
-                                                <img src={i.images?.[0]} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                        <div key={i.id} className="flex gap-12 border-b border-white/[0.03] pb-16">
+                                            <div className="w-40 h-52 flex-shrink-0 border border-white/5 overflow-hidden shadow-2xl rounded-sm">
+                                                <img src={i.images?.[0]} className="w-full h-full object-cover" />
                                             </div>
                                             <div className="flex-grow flex flex-col justify-center">
-                                                <p className="text-[12px] font-black uppercase tracking-[0.3em] mb-4 text-white/80">{i.name}</p>
-                                                <p className="text-[#d4af37] text-3xl font-bold font-serif mb-8">R$ {parseFloat(i.price).toFixed(2)}</p>
-                                                <div className="flex items-center gap-10">
-                                                    <div className="flex items-center bg-white/[0.05] p-2 rounded-sm border border-white/5">
-                                                        <button onClick={() => setCart(prev => prev.map(p => p.id === i.id ? {...p, quantity: Math.max(0, p.quantity - 1)} : p).filter(p => p.quantity > 0))} className="text-gray-600 w-12 h-12 flex items-center justify-center hover:text-white text-3xl transition-colors font-thin">-</button>
-                                                        <span className="text-sm font-black w-10 text-center text-white">{i.quantity}</span>
-                                                        <button onClick={() => setCart(prev => prev.map(p => p.id === i.id ? {...p, quantity: p.quantity + 1} : p))} className="text-gray-600 w-12 h-12 flex items-center justify-center hover:text-white text-3xl transition-colors font-thin">+</button>
+                                                <p className="text-[14px] font-black uppercase tracking-[0.4em] mb-4 text-white/90">{i.name}</p>
+                                                <p className="text-[#d4af37] text-4xl font-bold font-serif mb-10">R$ {parseFloat(i.price).toFixed(2)}</p>
+                                                <div className="flex items-center gap-12">
+                                                    <div className="flex items-center bg-white/[0.03] p-3 rounded-sm border border-white/5">
+                                                        <button onClick={() => setCart(prev => prev.map(p => p.id === i.id ? {...p, quantity: Math.max(0, p.quantity - 1)} : p).filter(p => p.quantity > 0))} className="text-white/20 w-12 h-12 flex items-center justify-center hover:text-white text-4xl font-thin transition-all">-</button>
+                                                        <span className="text-lg font-black w-14 text-center text-[#d4af37]">{i.quantity}</span>
+                                                        <button onClick={() => setCart(prev => prev.map(p => p.id === i.id ? {...p, quantity: p.quantity + 1} : p))} className="text-white/20 w-12 h-12 flex items-center justify-center hover:text-white text-4xl font-thin transition-all">+</button>
                                                     </div>
-                                                    <button onClick={() => setCart(prev => prev.filter(p => p.id !== i.id))} className="text-[10px] uppercase text-red-900 font-black tracking-[0.3em] hover:text-red-600 transition-colors">Remover</button>
+                                                    <button onClick={() => setCart(prev => prev.filter(p => p.id !== i.id))} className="text-[11px] uppercase text-red-900 font-black tracking-[0.4em] hover:text-red-500 transition-all">Eliminar</button>
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                                 {cart.length > 0 && (
-                                    <div className="mt-auto pt-20 border-t border-white/10">
-                                        <div className="flex justify-between items-end mb-16">
-                                            <span className="text-gray-800 uppercase text-[14px] font-black tracking-[0.6em]">Investimento Total</span>
-                                            <span className="font-bold text-5xl text-[#d4af37] font-serif">R$ {cart.reduce((a,b)=>a+(parseFloat(b.price)*b.quantity), 0).toFixed(2)}</span>
+                                    <div className="mt-auto pt-24">
+                                        <div className="flex justify-between items-end mb-20">
+                                            <span className="text-white/10 uppercase text-[16px] font-black tracking-[0.8em]">Total</span>
+                                            <span className="font-bold text-6xl text-[#d4af37] font-serif shadow-gold">R$ {cart.reduce((a,b)=>a+(parseFloat(b.price)*b.quantity), 0).toFixed(2)}</span>
                                         </div>
                                         <button onClick={() => {
-                                            const text = `✨ *SOLICITAÇÃO DE ENCOMENDA - GOLD BOSS* ✨\n\n${cart.map(i => `💍 *${i.name}*\nQuant: ${i.quantity} un | Valor: R$ ${(i.price * i.quantity).toFixed(2)}`).join('\n\n')}\n\n━━━━━━━━━━━━━━━━━━━━\n💰 *VALOR TOTAL: R$ ${cart.reduce((a,b)=>a+(parseFloat(b.price)*b.quantity), 0).toFixed(2)}*\n━━━━━━━━━━━━━━━━━━━━\n\nOlá! Gostaria de prosseguir com o pedido destas joias.`;
+                                            const text = `⚜️ *GOLD BOSS BOUTIQUE - PEDIDO EXCLUSIVO* ⚜️\n\n${cart.map(i => `💍 *${i.name}*\nQtd: ${i.quantity} | R$ ${(i.price * i.quantity).toFixed(2)}`).join('\n\n')}\n\n━━━━━━━━━━━━━━━━━━━━\n💎 *TOTAL: R$ ${cart.reduce((a,b)=>a+(parseFloat(b.price)*b.quantity), 0).toFixed(2)}*\n━━━━━━━━━━━━━━━━━━━━\n\n_Desejo prosseguir com a reserva das joias acima._`;
                                             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
-                                        }} className="w-full bg-[#25D366] text-white py-9 font-black uppercase text-[12px] tracking-[0.5em] flex items-center justify-center gap-8 hover:brightness-110 active:scale-95 transition-all shadow-[0_30px_70px_rgba(37,211,102,0.25)]">
-                                            <span>Finalizar via WhatsApp</span>
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                        }} className="btn-gold-3d w-full text-black py-10 font-black uppercase text-[12px] tracking-[0.6em] flex items-center justify-center gap-10">
+                                            <span>Finalizar Consultoria WhatsApp</span>
                                         </button>
                                     </div>
                                 )}
                             </div>
                         </div>
                     )}
-
-                    <footer className="py-52 text-center border-t border-white/[0.05] bg-black">
-                        <div className="max-w-7xl mx-auto px-6">
-                            <h2 className="text-6xl font-serif lux-3d-title mb-12 font-bold leading-none tracking-tighter">Gold boss</h2>
-                            <p className="text-[11px] tracking-[1.2em] uppercase font-black text-gray-800 mb-20">Areté & Exclusividade Digital</p>
-                            <div className="flex justify-center gap-20 text-[12px] uppercase tracking-[0.5em] text-gray-800 font-black mb-32">
-                                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" className="hover:text-white transition-all underline underline-offset-8 decoration-white/10">WhatsApp</a>
-                                <span className="hover:text-white transition-all underline underline-offset-8 decoration-white/10">Instagram</span>
-                                <span className="hover:text-white transition-all underline underline-offset-8 decoration-white/10">Sobre Nós</span>
-                            </div>
-                            <p className="text-[10px] text-gray-900 uppercase tracking-[0.3em] font-black">© 2026 Gold boss • Crafted for Excellence • Boutique de Semi-Joias Premium</p>
-                        </div>
-                    </footer>
                 </div>
             );
         };
